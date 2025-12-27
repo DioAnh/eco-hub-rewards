@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Leaf } from "lucide-react";
+import { WalletConnectButton } from "@/components/WalletConnectButton";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,9 +40,7 @@ const Header = () => {
             <Button variant="ghost" size="sm">
               Đăng nhập
             </Button>
-            <Button size="sm">
-              Kết nối Wallet
-            </Button>
+            <WalletConnectButton />
           </div>
 
           <button
@@ -74,9 +73,7 @@ const Header = () => {
                 <Button variant="ghost" size="sm">
                   Đăng nhập
                 </Button>
-                <Button size="sm">
-                  Kết nối Wallet
-                </Button>
+                <WalletConnectButton />
               </div>
             </nav>
           </div>
