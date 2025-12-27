@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { FlowingDataNode } from "./FlowingDataNode";
+import { Terminal, Zap, ShoppingCart } from "lucide-react";
+import { CyberButton } from "./CyberButton";
 import product1 from "@/assets/product-1.jpg";
 import product2 from "@/assets/product-2.jpg";
 import product3 from "@/assets/product-3.jpg";
@@ -32,170 +33,224 @@ const products = [
   { id: 24, name: "Bamboo Desk Organizer", price: 259000, ecoTokens: 52, co2Saved: 2.7, image: product3 },
 ];
 
-interface NodeState {
-  id: number;
-  position: { x: number; y: number };
-  velocity: { x: number; y: number };
-  trail: { x: number; y: number }[];
+// Split products into rows for multi-lane flow
+const row1 = products.slice(0, 8);
+const row2 = products.slice(8, 16);
+const row3 = products.slice(16, 24);
+
+interface ProductNodeProps {
+  product: typeof products[0];
+  onBuy: () => void;
 }
 
-export const FlowingProductsSection = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [nodes, setNodes] = useState<NodeState[]>([]);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  const animationRef = useRef<number>();
-  const isPausedRef = useRef(false);
+const ProductNode = ({ product, onBuy }: ProductNodeProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [scanY, setScanY] = useState(0);
 
-  // Initialize nodes with random positions and velocities
   useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const updateSize = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      setContainerSize({ width: rect.width, height: rect.height });
+    if (isHovered) {
+      const interval = setInterval(() => {
+        setScanY((prev) => (prev + 5) % 100);
+      }, 50);
+      return () => clearInterval(interval);
+    }
+    setScanY(0);
+  }, [isHovered]);
+
+  return (
+    <motion.div
+      className="relative flex-shrink-0 cursor-pointer select-none group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ scale: 1.1, zIndex: 50 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    >
+      {/* Digital trail glow */}
+      <div 
+        className="absolute -right-8 top-1/2 -translate-y-1/2 w-16 h-1 pointer-events-none opacity-60"
+        style={{
+          background: "linear-gradient(90deg, hsl(120 100% 50% / 0.8), hsl(120 100% 50% / 0.3), transparent)",
+          boxShadow: "0 0 10px hsl(120 100% 50% / 0.5)",
+          filter: "blur(2px)",
+        }}
+      />
       
-      // Initialize nodes
-      const initialNodes: NodeState[] = products.map((product, index) => {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 0.5 + Math.random() * 1.5; // Different velocities
-        return {
-          id: product.id,
-          position: {
-            x: Math.random() * rect.width,
-            y: Math.random() * rect.height,
+      {/* Outer glow */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background: isHovered
+            ? "radial-gradient(circle, hsl(120 100% 50% / 0.4) 0%, transparent 70%)"
+            : "radial-gradient(circle, hsl(120 100% 50% / 0.1) 0%, transparent 70%)",
+          filter: "blur(20px)",
+          transform: "scale(1.5)",
+        }}
+      />
+
+      {/* Main node container */}
+      <div
+        className="relative w-40 h-48 overflow-hidden transition-all duration-300"
+        style={{
+          clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+          background: "linear-gradient(180deg, hsl(180 15% 8%) 0%, hsl(0 0% 0%) 100%)",
+          border: isHovered ? "2px solid hsl(120 100% 50%)" : "1px solid hsl(120 100% 30%)",
+          boxShadow: isHovered
+            ? "0 0 30px hsl(120 100% 50% / 0.5), inset 0 0 30px hsl(120 100% 50% / 0.1)"
+            : "0 0 10px hsl(120 100% 50% / 0.2)",
+        }}
+      >
+        {/* Scan effect line */}
+        {isHovered && (
+          <motion.div
+            className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent pointer-events-none"
+            style={{
+              top: `${scanY}%`,
+              boxShadow: "0 0 15px hsl(120 100% 50%)",
+            }}
+          />
+        )}
+
+        {/* Grid overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            backgroundImage: `
+              linear-gradient(hsl(120 100% 50% / 0.15) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(120 100% 50% / 0.15) 1px, transparent 1px)
+            `,
+            backgroundSize: "12px 12px",
+          }}
+        />
+
+        {/* Product image */}
+        <div className="absolute top-5 left-1/2 -translate-x-1/2 w-16 h-16 overflow-hidden rounded-sm border border-primary/30">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover transition-all duration-300"
+            style={{
+              filter: isHovered ? "none" : "grayscale(30%) brightness(0.8)",
+            }}
+          />
+          {isHovered && (
+            <div className="absolute inset-0 bg-primary/10 mix-blend-overlay animate-pulse" />
+          )}
+        </div>
+
+        {/* Product info */}
+        <div className="absolute bottom-5 left-0 right-0 text-center px-2">
+          <h3 className="font-mono text-[9px] text-primary truncate uppercase tracking-wider">
+            {product.name}
+          </h3>
+          <p className="font-mono text-primary text-[11px] mt-0.5 neon-text">
+            {product.price.toLocaleString()}đ
+          </p>
+        </div>
+
+        {/* Corner decorations */}
+        <div className="absolute top-1.5 left-1.5 w-2 h-2 border-l border-t border-primary/50" />
+        <div className="absolute top-1.5 right-1.5 w-2 h-2 border-r border-t border-primary/50" />
+        <div className="absolute bottom-1.5 left-1.5 w-2 h-2 border-l border-b border-primary/50" />
+        <div className="absolute bottom-1.5 right-1.5 w-2 h-2 border-r border-b border-primary/50" />
+      </div>
+
+      {/* Hover indicators */}
+      {isHovered && (
+        <>
+          <motion.div
+            className="absolute -top-8 left-1/2 -translate-x-1/2 z-20"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="flex items-center gap-1 px-2 py-1 bg-black/95 border border-primary/50 font-mono text-[9px] text-primary whitespace-nowrap">
+              <Terminal className="w-2.5 h-2.5" />
+              <span>{product.co2Saved}kg CO₂</span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="absolute -right-16 top-1/2 -translate-y-1/2 z-20"
+            initial={{ opacity: 0, x: -5 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.05 }}
+          >
+            <div className="flex items-center gap-1 px-2 py-1 bg-black/95 border border-secondary/50 font-mono text-[9px] text-secondary whitespace-nowrap">
+              <Zap className="w-2.5 h-2.5" />
+              <span>+{product.ecoTokens} ECO</span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-30"
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <CyberButton onClick={onBuy}>
+              <ShoppingCart className="w-3 h-3 mr-1" />
+              EXECUTE
+            </CyberButton>
+          </motion.div>
+        </>
+      )}
+    </motion.div>
+  );
+};
+
+interface FlowingRowProps {
+  products: typeof row1;
+  speed: number;
+  direction: 'left' | 'right';
+  onBuy: (id: number) => void;
+}
+
+const FlowingRow = ({ products, speed, direction, onBuy }: FlowingRowProps) => {
+  const duplicatedProducts = [...products, ...products, ...products];
+  
+  return (
+    <div className="relative overflow-hidden py-8">
+      {/* Left fade */}
+      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
+      {/* Right fade */}
+      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
+      
+      <motion.div
+        className="flex gap-8 items-center"
+        animate={{
+          x: direction === 'left' ? [0, -100 * products.length * 2] : [-100 * products.length * 2, 0],
+        }}
+        transition={{
+          x: {
+            repeat: Infinity,
+            repeatType: "loop",
+            duration: speed,
+            ease: "linear",
           },
-          velocity: {
-            x: Math.cos(angle) * speed,
-            y: Math.sin(angle) * speed,
-          },
-          trail: [],
-        };
-      });
-      setNodes(initialNodes);
-    };
+        }}
+        style={{ width: 'fit-content' }}
+      >
+        {duplicatedProducts.map((product, index) => (
+          <ProductNode
+            key={`${product.id}-${index}`}
+            product={product}
+            onBuy={() => onBuy(product.id)}
+          />
+        ))}
+      </motion.div>
+    </div>
+  );
+};
 
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-
-  // Physics animation loop
-  useEffect(() => {
-    if (nodes.length === 0 || containerSize.width === 0) return;
-
-    const nodeWidth = 176; // w-44
-    const nodeHeight = 208; // h-52
-    const padding = 50;
-    const maxTrailLength = 20;
-
-    const animate = () => {
-      if (isPausedRef.current) {
-        animationRef.current = requestAnimationFrame(animate);
-        return;
-      }
-
-      setNodes(prevNodes => {
-        return prevNodes.map(node => {
-          let newX = node.position.x + node.velocity.x;
-          let newY = node.position.y + node.velocity.y;
-          let newVelX = node.velocity.x;
-          let newVelY = node.velocity.y;
-
-          // Wrap around screen edges for continuous flow
-          if (newX < -nodeWidth / 2) {
-            newX = containerSize.width + nodeWidth / 2;
-            // Reset trail when wrapping
-            return {
-              ...node,
-              position: { x: newX, y: newY },
-              velocity: { x: newVelX, y: newVelY },
-              trail: [],
-            };
-          }
-          if (newX > containerSize.width + nodeWidth / 2) {
-            newX = -nodeWidth / 2;
-            return {
-              ...node,
-              position: { x: newX, y: newY },
-              velocity: { x: newVelX, y: newVelY },
-              trail: [],
-            };
-          }
-          if (newY < -nodeHeight / 2) {
-            newY = containerSize.height + nodeHeight / 2;
-            return {
-              ...node,
-              position: { x: newX, y: newY },
-              velocity: { x: newVelX, y: newVelY },
-              trail: [],
-            };
-          }
-          if (newY > containerSize.height + nodeHeight / 2) {
-            newY = -nodeHeight / 2;
-            return {
-              ...node,
-              position: { x: newX, y: newY },
-              velocity: { x: newVelX, y: newVelY },
-              trail: [],
-            };
-          }
-
-          // Add slight random variation to velocity for organic movement
-          newVelX += (Math.random() - 0.5) * 0.02;
-          newVelY += (Math.random() - 0.5) * 0.02;
-
-          // Clamp velocity
-          const speed = Math.sqrt(newVelX * newVelX + newVelY * newVelY);
-          const maxSpeed = 2;
-          const minSpeed = 0.3;
-          if (speed > maxSpeed) {
-            newVelX = (newVelX / speed) * maxSpeed;
-            newVelY = (newVelY / speed) * maxSpeed;
-          } else if (speed < minSpeed) {
-            newVelX = (newVelX / speed) * minSpeed;
-            newVelY = (newVelY / speed) * minSpeed;
-          }
-
-          // Update trail
-          const newTrail = [
-            { x: node.position.x, y: node.position.y },
-            ...node.trail.slice(0, maxTrailLength - 1),
-          ];
-
-          return {
-            ...node,
-            position: { x: newX, y: newY },
-            velocity: { x: newVelX, y: newVelY },
-            trail: newTrail,
-          };
-        });
-      });
-
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [nodes.length, containerSize]);
-
-  const handlePositionUpdate = useCallback((id: number, pos: { x: number; y: number }, vel: { x: number; y: number }) => {
-    // Position updates are handled in the animation loop
-  }, []);
-
+export const FlowingProductsSection = () => {
   const handleBuy = (productId: number) => {
     console.log(`Executing purchase for product ${productId}`);
   };
 
   return (
-    <section id="marketplace" className="relative min-h-screen py-20 overflow-hidden">
+    <section id="marketplace" className="relative py-20 overflow-hidden bg-black">
       {/* Section header */}
       <motion.div
-        className="text-center mb-12 px-4 relative z-20"
+        className="text-center mb-8 px-4 relative z-20"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -209,50 +264,33 @@ export const FlowingProductsSection = () => {
           <span className="text-primary neon-text">Data Flow</span>
         </h2>
         <p className="text-muted-foreground max-w-2xl mx-auto font-mono text-sm">
-          {">> "} Nodes flowing through the digital void. Hover to intercept. Execute to acquire.
+          {">> "} 24 eco-products streaming through the void. Hover to intercept.
         </p>
       </motion.div>
 
-      {/* Flowing nodes container */}
-      <div
-        ref={containerRef}
-        className="relative h-[900px] max-w-full mx-auto"
-        onMouseEnter={() => { isPausedRef.current = false; }}
-      >
-        {/* Background grid effect */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-20"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 50% 50%, hsl(120 100% 50% / 0.1) 0%, transparent 50%),
-              linear-gradient(hsl(120 100% 50% / 0.05) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(120 100% 50% / 0.05) 1px, transparent 1px)
-            `,
-            backgroundSize: '100% 100%, 50px 50px, 50px 50px',
-          }}
-        />
+      {/* Background grid effect */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-10"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 50% 50%, hsl(120 100% 50% / 0.15) 0%, transparent 60%),
+            linear-gradient(hsl(120 100% 50% / 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(120 100% 50% / 0.08) 1px, transparent 1px)
+          `,
+          backgroundSize: '100% 100%, 40px 40px, 40px 40px',
+        }}
+      />
 
-        {nodes.map((node, index) => {
-          const product = products.find(p => p.id === node.id);
-          if (!product) return null;
-          
-          return (
-            <FlowingDataNode
-              key={node.id}
-              product={product}
-              position={node.position}
-              velocity={node.velocity}
-              trailPositions={node.trail}
-              onPositionUpdate={handlePositionUpdate}
-              onBuy={() => handleBuy(product.id)}
-            />
-          );
-        })}
-
-        {/* Ambient glow effects */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full filter blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full filter blur-[120px] pointer-events-none" />
+      {/* Flowing product rows - 3 lanes with different speeds and directions */}
+      <div className="relative z-10 space-y-4">
+        <FlowingRow products={row1} speed={60} direction="left" onBuy={handleBuy} />
+        <FlowingRow products={row2} speed={45} direction="right" onBuy={handleBuy} />
+        <FlowingRow products={row3} speed={55} direction="left" onBuy={handleBuy} />
       </div>
+
+      {/* Ambient glow effects */}
+      <div className="absolute top-1/3 left-0 w-64 h-64 bg-primary/5 rounded-full filter blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-0 w-96 h-96 bg-secondary/5 rounded-full filter blur-[120px] pointer-events-none" />
     </section>
   );
 };
