@@ -40,6 +40,34 @@ const row1 = products.slice(0, 8);
 const row2 = products.slice(8, 16);
 const row3 = products.slice(16, 24);
 
+// Simplex noise function for organic movement
+const simplex2D = (x: number, y: number): number => {
+  // Simplified noise approximation using sine waves
+  const n1 = Math.sin(x * 1.27 + y * 0.63) * 0.5;
+  const n2 = Math.sin(x * 0.89 - y * 1.43) * 0.3;
+  const n3 = Math.sin(x * 2.13 + y * 0.97) * 0.2;
+  return n1 + n2 + n3;
+};
+
+// Generate unique kinetic properties for each product
+interface KineticProperties {
+  frequency: number;
+  amplitude: number;
+  phaseOffset: number;
+  rotationSpeed: number;
+  velocityMultiplier: number;
+  noiseOffset: { x: number; y: number };
+}
+
+const generateKineticProps = (index: number): KineticProperties => ({
+  frequency: 0.6 + Math.random() * 0.4, // 0.6 - 1.0
+  amplitude: 8 + Math.random() * 6, // 8 - 14 pixels
+  phaseOffset: index * 0.7 + Math.random() * Math.PI,
+  rotationSpeed: 0.2 + Math.random() * 0.3,
+  velocityMultiplier: 0.95 + Math.random() * 0.1, // 0.95 - 1.05 (5-10% variation)
+  noiseOffset: { x: Math.random() * 1000, y: Math.random() * 1000 },
+});
+
 interface DataPacketProps {
   product: typeof products[0];
   index: number;
@@ -48,6 +76,8 @@ interface DataPacketProps {
   onPositionUpdate: (index: number, x: number, y: number) => void;
   isGlitching: boolean;
   velocity: number;
+  kineticProps: KineticProperties;
+  globalTime: number;
 }
 
 const DataPacket = ({ 
@@ -57,13 +87,28 @@ const DataPacket = ({
   onHover,
   onPositionUpdate,
   isGlitching, 
-  velocity
+  velocity,
+  kineticProps,
+  globalTime,
 }: DataPacketProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
   const [pulseActive, setPulseActive] = useState(false);
+  
+  // Calculate individual kinetic motion
+  const { frequency, amplitude, phaseOffset, rotationSpeed, noiseOffset } = kineticProps;
+  
+  // Individual sine wave for Y-axis bobbing
+  const sineY = Math.sin(globalTime * frequency + phaseOffset) * amplitude;
+  
+  // Noise-based micro-fluctuations (magnetic turbulence)
+  const noiseX = simplex2D(globalTime * 0.3 + noiseOffset.x, noiseOffset.y) * 4;
+  const noiseY = simplex2D(noiseOffset.x, globalTime * 0.25 + noiseOffset.y) * 3;
+  
+  // Rotational drift (-2 to +2 degrees)
+  const rotationZ = Math.sin(globalTime * rotationSpeed + phaseOffset) * 2;
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -137,6 +182,11 @@ const DataPacket = ({
   // Kinetic aura intensity based on velocity
   const auraIntensity = Math.min(velocity * 0.5, 1);
 
+  // Combine all transforms
+  const kineticTransform = isHovered 
+    ? 'scale(1.25) translateY(0) translateX(0) rotate(0deg)'
+    : `scale(1) translateY(${sineY + noiseY}px) translateX(${noiseX}px) rotate(${rotationZ}deg)`;
+
   return (
     <div
       ref={nodeRef}
@@ -151,9 +201,12 @@ const DataPacket = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
-        transform: isHovered ? 'scale(1.25)' : 'scale(1)',
+        transform: kineticTransform,
         zIndex: isHovered ? 100 : 1,
-        transition: 'transform 0.3s ease-out',
+        transition: isHovered 
+          ? 'transform 0.3s ease-out, z-index 0s' 
+          : 'transform 0.15s ease-out, z-index 0s 0.3s',
+        willChange: 'transform',
       }}
     >
       {/* Shockwave pulse */}
@@ -491,17 +544,38 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
   const offsetRef = useRef(0);
   const isPausedRef = useRef(false);
   const productPositionsRef = useRef<{ x: number; y: number }[]>([]);
-  const swayRef = useRef({ y: 0, rotation: 0 });
+  const [globalTime, setGlobalTime] = useState(0);
 
   // Duplicate products for seamless loop
   const allProducts = [...products, ...products, ...products];
+  
+  // Generate stable kinetic properties for each product (memoized)
+  const kineticPropsRef = useRef<KineticProperties[]>([]);
+  if (kineticPropsRef.current.length !== allProducts.length) {
+    kineticPropsRef.current = allProducts.map((_, idx) => generateKineticProps(idx + rowIndex * 100));
+  }
+  
+  // Global time animation loop for individual node physics
+  useEffect(() => {
+    let animationId: number;
+    let startTime = performance.now();
+    
+    const updateTime = () => {
+      const elapsed = (performance.now() - startTime) / 1000;
+      setGlobalTime(elapsed);
+      animationId = requestAnimationFrame(updateTime);
+    };
+    
+    animationId = requestAnimationFrame(updateTime);
+    return () => cancelAnimationFrame(animationId);
+  }, []);
 
   // Sync ref with state
   useEffect(() => {
     isPausedRef.current = isRowPaused;
   }, [isRowPaused]);
 
-  // GSAP magnetic field physics movement
+  // GSAP horizontal movement only - individual nodes handle their own Y/rotation
   useEffect(() => {
     if (!rowRef.current) return;
 
@@ -515,34 +589,6 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
     } else {
       gsap.set(rowRef.current, { x: -totalWidth });
     }
-
-    // Continuous Y swaying animation
-    const swayTl = gsap.timeline({ repeat: -1 });
-    swayTl.to(swayRef.current, {
-      y: 8 + rowIndex * 3,
-      rotation: 1.5,
-      duration: 2 + rowIndex * 0.5,
-      ease: "sine.inOut",
-    })
-    .to(swayRef.current, {
-      y: -8 - rowIndex * 3,
-      rotation: -1.5,
-      duration: 2 + rowIndex * 0.5,
-      ease: "sine.inOut",
-    });
-
-    // Update row Y position based on sway
-    let swayRafId: number;
-    const updateSway = () => {
-      if (rowRef.current && !isPausedRef.current) {
-        gsap.set(rowRef.current, {
-          y: swayRef.current.y,
-          rotateZ: swayRef.current.rotation,
-        });
-      }
-      swayRafId = requestAnimationFrame(updateSway);
-    };
-    swayRafId = requestAnimationFrame(updateSway);
 
     const animate = () => {
       if (!rowRef.current) return;
@@ -623,8 +669,6 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
     gsap.delayedCall(startDelay, animate);
 
     return () => {
-      cancelAnimationFrame(swayRafId);
-      swayTl.kill();
       if (animationRef.current) {
         animationRef.current.kill();
       }
@@ -728,6 +772,8 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
             onPositionUpdate={handlePositionUpdate}
             isGlitching={glitchingIndex === index}
             velocity={velocity}
+            kineticProps={kineticPropsRef.current[index]}
+            globalTime={globalTime}
           />
         ))}
       </div>
