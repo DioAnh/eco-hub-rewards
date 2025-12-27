@@ -479,9 +479,9 @@ const DataStreamRow = ({ products, direction, baseSpeed, onBuy }: DataStreamRowP
   }, [allProducts.length]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="relative overflow-hidden"
+      className="relative overflow-visible"
       style={{ padding: '60px 0' }} // Extra padding for hover elements
     >
       {/* Edge fade effects */}
