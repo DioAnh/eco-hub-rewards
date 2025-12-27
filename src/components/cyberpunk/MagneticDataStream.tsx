@@ -45,7 +45,7 @@ interface DataPacketProps {
   index: number;
   onBuy: () => void;
   onHover: (hovered: boolean) => void;
-  onPositionUpdate: (x: number, y: number) => void;
+  onPositionUpdate: (index: number, x: number, y: number) => void;
   isGlitching: boolean;
   velocity: number;
 }
@@ -75,25 +75,18 @@ const DataPacket = ({
     onHover(false);
   };
 
-  // Update position for grid interaction - throttled to prevent infinite loops
+  // Update position for grid interaction (lightweight: on mount + resize only)
   useEffect(() => {
-    let animationId: number;
-    let lastUpdate = 0;
-    
     const updatePosition = () => {
-      const now = Date.now();
-      // Throttle to max 10 updates per second
-      if (now - lastUpdate > 100 && nodeRef.current) {
-        const rect = nodeRef.current.getBoundingClientRect();
-        onPositionUpdate(rect.left + rect.width / 2, rect.top + rect.height / 2);
-        lastUpdate = now;
-      }
-      animationId = requestAnimationFrame(updatePosition);
+      if (!nodeRef.current) return;
+      const rect = nodeRef.current.getBoundingClientRect();
+      onPositionUpdate(index, rect.left + rect.width / 2, rect.top + rect.height / 2);
     };
-    
-    animationId = requestAnimationFrame(updatePosition);
-    return () => cancelAnimationFrame(animationId);
-  }, [onPositionUpdate]);
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    return () => window.removeEventListener("resize", updatePosition);
+  }, [index, onPositionUpdate]);
 
   // Scan effect on hover
   useEffect(() => {
@@ -530,6 +523,7 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
     });
 
     // Update row Y position based on sway
+    let swayRafId: number;
     const updateSway = () => {
       if (rowRef.current && !isPausedRef.current) {
         gsap.set(rowRef.current, {
@@ -537,9 +531,9 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
           rotateZ: swayRef.current.rotation,
         });
       }
-      requestAnimationFrame(updateSway);
+      swayRafId = requestAnimationFrame(updateSway);
     };
-    const swayFrame = requestAnimationFrame(updateSway);
+    swayRafId = requestAnimationFrame(updateSway);
 
     const animate = () => {
       if (!rowRef.current) return;
@@ -603,7 +597,7 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
     gsap.delayedCall(startDelay, animate);
 
     return () => {
-      cancelAnimationFrame(swayFrame);
+      cancelAnimationFrame(swayRafId);
       swayTl.kill();
       if (animationRef.current) {
         animationRef.current.kill();
@@ -704,7 +698,7 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
             index={index}
             onBuy={() => onBuy(product.id)}
             onHover={handleProductHover}
-            onPositionUpdate={(x, y) => handlePositionUpdate(index, x, y)}
+            onPositionUpdate={handlePositionUpdate}
             isGlitching={glitchingIndex === index}
             velocity={velocity}
           />
