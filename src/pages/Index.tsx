@@ -1,13 +1,12 @@
 import { Helmet } from "react-helmet-async";
 import {
-  ParticleBackground,
-  MinimalHeader,
-  BioDynamicHero,
-  FloatingBiomesSection,
-  OrbitalMenu,
-} from "@/components/bio-dynamic";
-import GreenAvatarSection from "@/components/GreenAvatarSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
+  MatrixBackground,
+  CyberHeader,
+  CyberpunkHero,
+  DataNodesSection,
+  CyberMenu,
+  MarqueeTicker,
+} from "@/components/cyberpunk";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -17,30 +16,29 @@ const Index = () => {
         <title>EcoShop - Circular Economy Hub on Sui Network</title>
         <meta
           name="description"
-          content="EcoShop - Nền tảng Circular Economy Hub đầu tiên trên Sui, token hóa tài sản xanh và thưởng ECO Token cho mỗi giao dịch bền vững."
+          content="EcoShop - Nền tảng Circular Economy Hub đầu tiên trên Sui, token hóa tài sản xanh và thưởng ECO Token."
         />
       </Helmet>
 
-      <div className="min-h-screen bg-background overflow-x-hidden">
-        {/* WebGL Particle Background */}
-        <ParticleBackground ecoActivity={0.8} />
+      <div className="min-h-screen bg-black overflow-x-hidden scanlines">
+        {/* Matrix Rain Background */}
+        <MatrixBackground />
         
-        {/* Minimal Header */}
-        <MinimalHeader />
+        {/* Live Ticker */}
+        <MarqueeTicker />
         
-        {/* Orbital Navigation Menu */}
-        <OrbitalMenu />
+        {/* Cyber Header */}
+        <CyberHeader />
         
-        <main>
-          {/* Bio-Dynamic Hero */}
-          <BioDynamicHero />
+        {/* Cyber Menu */}
+        <CyberMenu />
+        
+        <main className="pt-8">
+          {/* Cyberpunk Hero */}
+          <CyberpunkHero />
           
-          {/* Floating Product Biomes */}
-          <FloatingBiomesSection />
-          
-          {/* Existing sections */}
-          <GreenAvatarSection />
-          <HowItWorksSection />
+          {/* Data Nodes (Products) */}
+          <DataNodesSection />
         </main>
         <Footer />
       </div>
