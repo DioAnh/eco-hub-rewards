@@ -75,13 +75,25 @@ const DataPacket = ({
     onHover(false);
   };
 
-  // Update position for grid interaction
+  // Update position for grid interaction - throttled to prevent infinite loops
   useEffect(() => {
-    if (nodeRef.current) {
-      const rect = nodeRef.current.getBoundingClientRect();
-      onPositionUpdate(rect.left + rect.width / 2, rect.top + rect.height / 2);
-    }
-  });
+    let animationId: number;
+    let lastUpdate = 0;
+    
+    const updatePosition = () => {
+      const now = Date.now();
+      // Throttle to max 10 updates per second
+      if (now - lastUpdate > 100 && nodeRef.current) {
+        const rect = nodeRef.current.getBoundingClientRect();
+        onPositionUpdate(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        lastUpdate = now;
+      }
+      animationId = requestAnimationFrame(updatePosition);
+    };
+    
+    animationId = requestAnimationFrame(updatePosition);
+    return () => cancelAnimationFrame(animationId);
+  }, [onPositionUpdate]);
 
   // Scan effect on hover
   useEffect(() => {
@@ -703,20 +715,30 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
 };
 
 export const MagneticDataStream = () => {
-  const [productPositions, setProductPositions] = useState<{ x: number; y: number }[]>([]);
+  const productPositionsRef = useRef<{ x: number; y: number }[]>([]);
+  const [, forceUpdate] = useState(0);
 
-  const handleBuy = (productId: number) => {
+  const handleBuy = useCallback((productId: number) => {
     console.log(`Executing purchase for product ${productId}`);
-  };
+  }, []);
 
+  // Use ref instead of state to prevent infinite re-renders
   const handlePositionsUpdate = useCallback((positions: { x: number; y: number }[]) => {
-    setProductPositions(positions);
+    productPositionsRef.current = positions;
+  }, []);
+
+  // Update grid positions periodically without causing infinite loop
+  useEffect(() => {
+    const interval = setInterval(() => {
+      forceUpdate(n => n + 1);
+    }, 500);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <section id="marketplace" className="relative py-16 overflow-hidden bg-black">
       {/* Conductive Grid Background */}
-      <ConductiveGrid productPositions={productPositions} />
+      <ConductiveGrid productPositions={productPositionsRef.current} />
 
       {/* Section header */}
       <motion.div
