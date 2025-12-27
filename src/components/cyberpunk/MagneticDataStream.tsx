@@ -103,17 +103,17 @@ const DataPacket = ({
     };
   }, [isHovered]);
 
-  // Periodic shockwave pulse
+  // Periodic shockwave pulse (only when hovered to avoid heavy background timers)
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (Math.random() > 0.7) {
-        setPulseActive(true);
-        setTimeout(() => setPulseActive(false), 1000);
-      }
-    }, 2500 + Math.random() * 1500);
-    
-    return () => clearInterval(interval);
-  }, []);
+    if (!isHovered) return;
+
+    const interval = window.setInterval(() => {
+      setPulseActive(true);
+      window.setTimeout(() => setPulseActive(false), 1000);
+    }, 2200 + Math.random() * 1200);
+
+    return () => window.clearInterval(interval);
+  }, [isHovered]);
 
   // Random glitch effect
   useEffect(() => {
@@ -140,7 +140,14 @@ const DataPacket = ({
   return (
     <div
       ref={nodeRef}
+      role="button"
+      tabIndex={0}
+      aria-label={`Open product: ${product.name}`}
       className={`relative flex-shrink-0 cursor-pointer select-none ${isGlitching ? 'glitch-active' : ''}`}
+      onClick={onBuy}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") onBuy();
+      }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -478,6 +485,8 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
   const [glitchingIndex, setGlitchingIndex] = useState<number | null>(null);
   const [isRowPaused, setIsRowPaused] = useState(false);
   const [velocity, setVelocity] = useState(0);
+  const velocityRef = useRef(0);
+  const lastVelocityUpdateRef = useRef(0);
   const animationRef = useRef<gsap.core.Timeline | null>(null);
   const offsetRef = useRef(0);
   const isPausedRef = useRef(false);
@@ -545,18 +554,35 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
       }
 
       const tl = gsap.timeline({
+        onStart: () => {
+          velocityRef.current = 1;
+          setVelocity(1);
+        },
         onUpdate: () => {
-          // Calculate velocity for kinetic effects
+          // Throttle React state updates to keep UI responsive
           const progress = tl.progress();
-          if (progress < 0.3) {
-            setVelocity(progress / 0.3);
-          } else if (progress < 0.5) {
-            setVelocity(1 - (progress - 0.3) / 0.2);
-          } else {
-            setVelocity(0);
+          const nextVelocity =
+            progress < 0.3
+              ? progress / 0.3
+              : progress < 0.5
+                ? 1 - (progress - 0.3) / 0.2
+                : 0;
+
+          const now = performance.now();
+          const shouldUpdate =
+            now - lastVelocityUpdateRef.current > 120 ||
+            Math.abs(nextVelocity - velocityRef.current) > 0.2;
+
+          if (shouldUpdate) {
+            lastVelocityUpdateRef.current = now;
+            velocityRef.current = nextVelocity;
+            setVelocity(nextVelocity);
           }
         },
         onComplete: () => {
+          velocityRef.current = 0;
+          setVelocity(0);
+
           // Reset position for seamless loop
           if (direction === 'left') {
             offsetRef.current -= burstDistance;
@@ -612,6 +638,7 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
     if (animationRef.current) {
       if (hovered) {
         animationRef.current.pause();
+        velocityRef.current = 0;
         setVelocity(0);
       } else {
         animationRef.current.resume();

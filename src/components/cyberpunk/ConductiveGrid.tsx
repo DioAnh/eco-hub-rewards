@@ -322,7 +322,7 @@ export const ConductiveGrid = ({ productPositions = [] }: ConductiveGridProps) =
       <Canvas
         camera={{ position: [0, 0, 10], fov: 50 }}
         gl={{ alpha: true, antialias: true }}
-        style={{ background: 'transparent' }}
+        style={{ background: 'transparent', pointerEvents: 'none' }}
       >
         <Scene productPositions={productPositions} />
       </Canvas>
