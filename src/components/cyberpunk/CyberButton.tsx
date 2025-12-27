@@ -4,9 +4,11 @@ import { cn } from "@/lib/utils";
 
 interface CyberButtonProps {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   variant?: "primary" | "secondary" | "danger";
+  disabled?: boolean;
+  style?: React.CSSProperties;
 }
 
 export const CyberButton = ({
@@ -14,6 +16,8 @@ export const CyberButton = ({
   onClick,
   className,
   variant = "primary",
+  disabled = false,
+  style: customStyle,
 }: CyberButtonProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -89,43 +93,46 @@ export const CyberButton = ({
     },
   };
 
-  const style = variantStyles[variant];
+  const variantStyle = variantStyles[variant];
 
   return (
     <motion.button
       ref={buttonRef}
       onClick={onClick}
+      disabled={disabled}
       className={cn(
         "relative px-6 py-3 font-mono text-sm uppercase tracking-wider",
         "flex items-center justify-center",
         "transition-all duration-200",
         glitchActive && "glitch-text",
+        disabled && "opacity-50 cursor-not-allowed",
         className
       )}
       style={{
         x: springX,
         y: springY,
-        color: style.text,
-        background: isHovered ? style.bg : "transparent",
-        border: `1px solid ${style.border}`,
-        boxShadow: isHovered ? style.shadow : "none",
+        color: variantStyle.text,
+        background: isHovered && !disabled ? variantStyle.bg : "transparent",
+        border: `1px solid ${variantStyle.border}`,
+        boxShadow: isHovered && !disabled ? variantStyle.shadow : "none",
         clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+        ...customStyle,
       }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={disabled ? {} : { scale: 0.95 }}
     >
       {/* Corner cuts */}
       <div 
         className="absolute top-0 left-0 w-3 h-3"
         style={{
-          borderLeft: `1px solid ${style.border}`,
-          borderTop: `1px solid ${style.border}`,
+          borderLeft: `1px solid ${variantStyle.border}`,
+          borderTop: `1px solid ${variantStyle.border}`,
         }}
       />
       <div 
         className="absolute bottom-0 right-0 w-3 h-3"
         style={{
-          borderRight: `1px solid ${style.border}`,
-          borderBottom: `1px solid ${style.border}`,
+          borderRight: `1px solid ${variantStyle.border}`,
+          borderBottom: `1px solid ${variantStyle.border}`,
         }}
       />
       
