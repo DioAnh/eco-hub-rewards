@@ -5,8 +5,8 @@ import {
   CyberpunkHero,
   CyberMenu,
   MarqueeTicker,
+  DataStreamSection,
 } from "@/components/cyberpunk";
-import { FlowingProductsSection } from "@/components/cyberpunk/FlowingProductsSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -37,8 +37,8 @@ const Index = () => {
           {/* Cyberpunk Hero */}
           <CyberpunkHero />
           
-          {/* Flowing Data Products */}
-          <FlowingProductsSection />
+          {/* Data Stream Products */}
+          <DataStreamSection />
         </main>
         <Footer />
       </div>
