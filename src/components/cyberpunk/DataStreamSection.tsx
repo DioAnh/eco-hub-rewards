@@ -43,6 +43,7 @@ interface DataPacketProps {
   product: typeof products[0];
   index: number;
   onBuy: () => void;
+  onHover: (hovered: boolean) => void;
   isGlitching: boolean;
   isMaterializing: boolean;
   isDematerializing: boolean;
@@ -52,6 +53,7 @@ const DataPacket = ({
   product, 
   index, 
   onBuy, 
+  onHover,
   isGlitching, 
   isMaterializing, 
   isDematerializing 
@@ -59,6 +61,16 @@ const DataPacket = ({
   const [isHovered, setIsHovered] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    onHover(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    onHover(false);
+  };
 
   // Scan effect on hover
   useEffect(() => {
@@ -98,12 +110,12 @@ const DataPacket = ({
     <div
       ref={nodeRef}
       className={`relative flex-shrink-0 cursor-pointer select-none ${isGlitching ? 'glitch-active' : ''}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={{
-        transform: isHovered ? 'scale(1.15)' : 'scale(1)',
+        transform: isHovered ? 'scale(1.25)' : 'scale(1)',
         zIndex: isHovered ? 100 : 1,
-        transition: 'transform 0.2s ease-out',
+        transition: 'transform 0.3s ease-out',
       }}
     >
       {/* Materialize effect - scan line */}
@@ -348,13 +360,20 @@ const DataStreamRow = ({ products, direction, baseSpeed, onBuy }: DataStreamRowP
   const [glitchingIndex, setGlitchingIndex] = useState<number | null>(null);
   const [materializingIndices, setMaterializingIndices] = useState<Set<number>>(new Set());
   const [dematerializingIndices, setDematerializingIndices] = useState<Set<number>>(new Set());
+  const [isRowPaused, setIsRowPaused] = useState(false);
   const animationRef = useRef<gsap.core.Timeline | null>(null);
   const offsetRef = useRef(0);
+  const isPausedRef = useRef(false);
 
   // Duplicate products for seamless loop
   const allProducts = [...products, ...products, ...products];
 
-  // GSAP burst movement animation
+  // Sync ref with state
+  useEffect(() => {
+    isPausedRef.current = isRowPaused;
+  }, [isRowPaused]);
+
+  // GSAP burst movement animation - SLOWER
   useEffect(() => {
     if (!rowRef.current) return;
 
@@ -371,6 +390,12 @@ const DataStreamRow = ({ products, direction, baseSpeed, onBuy }: DataStreamRowP
 
     const animate = () => {
       if (!rowRef.current) return;
+
+      // Check if paused
+      if (isPausedRef.current) {
+        gsap.delayedCall(0.1, animate);
+        return;
+      }
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -392,25 +417,25 @@ const DataStreamRow = ({ products, direction, baseSpeed, onBuy }: DataStreamRowP
         }
       });
 
-      // Burst movement
+      // Burst movement - SLOWER (0.5s instead of 0.25s)
       tl.to(rowRef.current, {
         x: direction === 'left' 
           ? offsetRef.current - burstDistance 
           : offsetRef.current + burstDistance,
-        duration: 0.25 + Math.random() * 0.15,
+        duration: 0.5 + Math.random() * 0.2,
         ease: "power2.inOut",
       });
 
-      // Pause
+      // Pause - LONGER (2-3 seconds instead of 0.4-0.7s)
       tl.to({}, {
-        duration: 0.4 + Math.random() * 0.3,
+        duration: 2 + Math.random() * 1,
       });
 
       animationRef.current = tl;
     };
 
     // Start animation with initial delay based on row
-    const startDelay = Math.random() * 0.5;
+    const startDelay = Math.random() * 1;
     gsap.delayedCall(startDelay, animate);
 
     return () => {
@@ -420,6 +445,18 @@ const DataStreamRow = ({ products, direction, baseSpeed, onBuy }: DataStreamRowP
       gsap.killTweensOf(rowRef.current);
     };
   }, [direction, products.length]);
+
+  // Pause/resume animation when hovering
+  const handleProductHover = useCallback((hovered: boolean) => {
+    setIsRowPaused(hovered);
+    if (animationRef.current) {
+      if (hovered) {
+        animationRef.current.pause();
+      } else {
+        animationRef.current.resume();
+      }
+    }
+  }, []);
 
   // Random glitch trigger
   useEffect(() => {
@@ -433,10 +470,10 @@ const DataStreamRow = ({ products, direction, baseSpeed, onBuy }: DataStreamRowP
     };
 
     const interval = setInterval(() => {
-      if (Math.random() > 0.7) {
+      if (Math.random() > 0.7 && !isPausedRef.current) {
         triggerGlitch();
       }
-    }, 2000 + Math.random() * 2000);
+    }, 3000 + Math.random() * 2000);
 
     return () => clearInterval(interval);
   }, [allProducts.length]);
@@ -489,6 +526,7 @@ const DataStreamRow = ({ products, direction, baseSpeed, onBuy }: DataStreamRowP
             product={product}
             index={index}
             onBuy={() => onBuy(product.id)}
+            onHover={handleProductHover}
             isGlitching={glitchingIndex === index}
             isMaterializing={materializingIndices.has(index)}
             isDematerializing={dematerializingIndices.has(index)}
