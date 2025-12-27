@@ -8,3 +8,5 @@ export { CyberMenu } from "./CyberMenu";
 export { CyberHeader } from "./CyberHeader";
 export { DataNodesSection } from "./DataNodesSection";
 export { DataStreamSection } from "./DataStreamSection";
+export { MagneticDataStream } from "./MagneticDataStream";
+export { ConductiveGrid } from "./ConductiveGrid";

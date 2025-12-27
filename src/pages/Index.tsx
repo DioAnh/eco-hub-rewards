@@ -5,7 +5,7 @@ import {
   CyberpunkHero,
   CyberMenu,
   MarqueeTicker,
-  DataStreamSection,
+  MagneticDataStream,
 } from "@/components/cyberpunk";
 import Footer from "@/components/Footer";
 
@@ -37,8 +37,8 @@ const Index = () => {
           {/* Cyberpunk Hero */}
           <CyberpunkHero />
           
-          {/* Data Stream Products */}
-          <DataStreamSection />
+          {/* Magnetic Data Stream Products */}
+          <MagneticDataStream />
         </main>
         <Footer />
       </div>
