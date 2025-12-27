@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Terminal, Zap, ShoppingCart } from "lucide-react";
+import { Terminal, Zap, ShoppingCart, Shield, Star, Clock, Users } from "lucide-react";
 import gsap from "gsap";
 import { CyberButton } from "./CyberButton";
 import product1 from "@/assets/product-1.jpg";
@@ -8,30 +8,30 @@ import product2 from "@/assets/product-2.jpg";
 import product3 from "@/assets/product-3.jpg";
 
 const products = [
-  { id: 1, name: "Organic Canvas Bag", price: 189000, ecoTokens: 45, co2Saved: 2.3, image: product1 },
-  { id: 2, name: "Bamboo Straw Set", price: 89000, ecoTokens: 25, co2Saved: 0.8, image: product2 },
-  { id: 3, name: "Steel Water Bottle", price: 299000, ecoTokens: 60, co2Saved: 4.2, image: product3 },
-  { id: 4, name: "Wheat Lunch Box", price: 159000, ecoTokens: 35, co2Saved: 1.5, image: product1 },
-  { id: 5, name: "Bamboo Toothbrush", price: 45000, ecoTokens: 15, co2Saved: 0.5, image: product2 },
-  { id: 6, name: "Organic Cotton Towel", price: 249000, ecoTokens: 50, co2Saved: 3.1, image: product3 },
-  { id: 7, name: "Hemp Backpack", price: 459000, ecoTokens: 85, co2Saved: 5.2, image: product1 },
-  { id: 8, name: "Cork Wallet", price: 199000, ecoTokens: 40, co2Saved: 1.8, image: product2 },
-  { id: 9, name: "Recycled Notebook", price: 79000, ecoTokens: 20, co2Saved: 0.6, image: product3 },
-  { id: 10, name: "Solar Power Bank", price: 589000, ecoTokens: 100, co2Saved: 8.5, image: product1 },
-  { id: 11, name: "Beeswax Food Wrap", price: 129000, ecoTokens: 30, co2Saved: 1.2, image: product2 },
-  { id: 12, name: "Coconut Bowl Set", price: 169000, ecoTokens: 38, co2Saved: 1.4, image: product3 },
-  { id: 13, name: "Bamboo Cutlery Kit", price: 99000, ecoTokens: 22, co2Saved: 0.9, image: product1 },
-  { id: 14, name: "Reusable Coffee Cup", price: 189000, ecoTokens: 42, co2Saved: 2.1, image: product2 },
-  { id: 15, name: "Natural Fiber Mat", price: 349000, ecoTokens: 65, co2Saved: 3.8, image: product3 },
-  { id: 16, name: "Organic Soap Bar", price: 59000, ecoTokens: 12, co2Saved: 0.4, image: product1 },
-  { id: 17, name: "Recycled Glass Vase", price: 279000, ecoTokens: 55, co2Saved: 2.9, image: product2 },
-  { id: 18, name: "Bamboo Phone Case", price: 149000, ecoTokens: 32, co2Saved: 1.1, image: product3 },
-  { id: 19, name: "Hemp Rope Basket", price: 219000, ecoTokens: 48, co2Saved: 2.4, image: product1 },
-  { id: 20, name: "Sustainable Candle", price: 139000, ecoTokens: 28, co2Saved: 1.0, image: product2 },
-  { id: 21, name: "Eco Yoga Block", price: 179000, ecoTokens: 36, co2Saved: 1.6, image: product3 },
-  { id: 22, name: "Recycled Tote Bag", price: 119000, ecoTokens: 26, co2Saved: 0.7, image: product1 },
-  { id: 23, name: "Organic Tea Set", price: 389000, ecoTokens: 72, co2Saved: 4.5, image: product2 },
-  { id: 24, name: "Bamboo Desk Organizer", price: 259000, ecoTokens: 52, co2Saved: 2.7, image: product3 },
+  { id: 1, name: "Organic Canvas Bag", price: 189000, ecoTokens: 45, co2Saved: 2.3, rating: 4.8, buyers: 1247, verified: true, image: product1 },
+  { id: 2, name: "Bamboo Straw Set", price: 89000, ecoTokens: 25, co2Saved: 0.8, rating: 4.5, buyers: 892, verified: true, image: product2 },
+  { id: 3, name: "Steel Water Bottle", price: 299000, ecoTokens: 60, co2Saved: 4.2, rating: 4.9, buyers: 2103, verified: true, image: product3 },
+  { id: 4, name: "Wheat Lunch Box", price: 159000, ecoTokens: 35, co2Saved: 1.5, rating: 4.6, buyers: 567, verified: true, image: product1 },
+  { id: 5, name: "Bamboo Toothbrush", price: 45000, ecoTokens: 15, co2Saved: 0.5, rating: 4.4, buyers: 3421, verified: true, image: product2 },
+  { id: 6, name: "Organic Cotton Towel", price: 249000, ecoTokens: 50, co2Saved: 3.1, rating: 4.7, buyers: 432, verified: true, image: product3 },
+  { id: 7, name: "Hemp Backpack", price: 459000, ecoTokens: 85, co2Saved: 5.2, rating: 4.9, buyers: 789, verified: true, image: product1 },
+  { id: 8, name: "Cork Wallet", price: 199000, ecoTokens: 40, co2Saved: 1.8, rating: 4.3, buyers: 654, verified: false, image: product2 },
+  { id: 9, name: "Recycled Notebook", price: 79000, ecoTokens: 20, co2Saved: 0.6, rating: 4.2, buyers: 1876, verified: true, image: product3 },
+  { id: 10, name: "Solar Power Bank", price: 589000, ecoTokens: 100, co2Saved: 8.5, rating: 4.8, buyers: 1234, verified: true, image: product1 },
+  { id: 11, name: "Beeswax Food Wrap", price: 129000, ecoTokens: 30, co2Saved: 1.2, rating: 4.6, buyers: 987, verified: true, image: product2 },
+  { id: 12, name: "Coconut Bowl Set", price: 169000, ecoTokens: 38, co2Saved: 1.4, rating: 4.5, buyers: 543, verified: true, image: product3 },
+  { id: 13, name: "Bamboo Cutlery Kit", price: 99000, ecoTokens: 22, co2Saved: 0.9, rating: 4.7, buyers: 2345, verified: true, image: product1 },
+  { id: 14, name: "Reusable Coffee Cup", price: 189000, ecoTokens: 42, co2Saved: 2.1, rating: 4.4, buyers: 1567, verified: true, image: product2 },
+  { id: 15, name: "Natural Fiber Mat", price: 349000, ecoTokens: 65, co2Saved: 3.8, rating: 4.8, buyers: 321, verified: true, image: product3 },
+  { id: 16, name: "Organic Soap Bar", price: 59000, ecoTokens: 12, co2Saved: 0.4, rating: 4.1, buyers: 4532, verified: false, image: product1 },
+  { id: 17, name: "Recycled Glass Vase", price: 279000, ecoTokens: 55, co2Saved: 2.9, rating: 4.6, buyers: 234, verified: true, image: product2 },
+  { id: 18, name: "Bamboo Phone Case", price: 149000, ecoTokens: 32, co2Saved: 1.1, rating: 4.3, buyers: 1876, verified: true, image: product3 },
+  { id: 19, name: "Hemp Rope Basket", price: 219000, ecoTokens: 48, co2Saved: 2.4, rating: 4.5, buyers: 456, verified: true, image: product1 },
+  { id: 20, name: "Sustainable Candle", price: 139000, ecoTokens: 28, co2Saved: 1.0, rating: 4.7, buyers: 876, verified: true, image: product2 },
+  { id: 21, name: "Eco Yoga Block", price: 179000, ecoTokens: 36, co2Saved: 1.6, rating: 4.4, buyers: 654, verified: true, image: product3 },
+  { id: 22, name: "Recycled Tote Bag", price: 119000, ecoTokens: 26, co2Saved: 0.7, rating: 4.2, buyers: 2134, verified: false, image: product1 },
+  { id: 23, name: "Organic Tea Set", price: 389000, ecoTokens: 72, co2Saved: 4.5, rating: 4.9, buyers: 432, verified: true, image: product2 },
+  { id: 24, name: "Bamboo Desk Organizer", price: 259000, ecoTokens: 52, co2Saved: 2.7, rating: 4.6, buyers: 567, verified: true, image: product3 },
 ];
 
 // Split into rows
@@ -282,17 +282,17 @@ const DataPacket = ({
       <AnimatePresence>
         {isHovered && (
           <>
-            {/* CO2 indicator - top */}
+            {/* CO2 indicator - top left */}
             <motion.div
-              className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-              style={{ top: '-45px', zIndex: 200 }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
+              className="absolute pointer-events-none"
+              style={{ top: '-40px', left: '-20px', zIndex: 200 }}
+              initial={{ opacity: 0, y: 10, x: -10 }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
+              exit={{ opacity: 0, y: 10, x: -10 }}
               transition={{ duration: 0.15 }}
             >
               <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-xs whitespace-nowrap"
+                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] whitespace-nowrap"
                 style={{
                   background: 'hsl(0 0% 0% / 0.95)',
                   border: '1px solid hsl(120 100% 50% / 0.6)',
@@ -301,6 +301,28 @@ const DataPacket = ({
               >
                 <Terminal className="w-3 h-3 text-primary" />
                 <span className="text-primary">{product.co2Saved}kg CO₂</span>
+              </div>
+            </motion.div>
+
+            {/* Rating indicator - top right */}
+            <motion.div
+              className="absolute pointer-events-none"
+              style={{ top: '-40px', right: '-20px', zIndex: 200 }}
+              initial={{ opacity: 0, y: 10, x: 10 }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
+              exit={{ opacity: 0, y: 10, x: 10 }}
+              transition={{ duration: 0.15, delay: 0.03 }}
+            >
+              <div 
+                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] whitespace-nowrap"
+                style={{
+                  background: 'hsl(0 0% 0% / 0.95)',
+                  border: '1px solid hsl(45 100% 50% / 0.6)',
+                  boxShadow: '0 0 15px hsl(45 100% 50% / 0.3)',
+                }}
+              >
+                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                <span className="text-yellow-400">{product.rating}</span>
               </div>
             </motion.div>
 
@@ -314,7 +336,7 @@ const DataPacket = ({
               transition={{ duration: 0.15, delay: 0.05 }}
             >
               <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-xs whitespace-nowrap"
+                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] whitespace-nowrap"
                 style={{
                   background: 'hsl(0 0% 0% / 0.95)',
                   border: '1px solid hsl(180 100% 50% / 0.6)',
@@ -326,17 +348,63 @@ const DataPacket = ({
               </div>
             </motion.div>
 
-            {/* Execute button - bottom */}
+            {/* Verified / Buyers indicator - left */}
             <motion.div
-              className="absolute left-1/2 -translate-x-1/2"
-              style={{ bottom: '-50px', zIndex: 200 }}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+              style={{ left: '-85px', zIndex: 200 }}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.15, delay: 0.07 }}
+            >
+              <div 
+                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] whitespace-nowrap"
+                style={{
+                  background: 'hsl(0 0% 0% / 0.95)',
+                  border: `1px solid ${product.verified ? 'hsl(280 100% 60% / 0.6)' : 'hsl(0 0% 50% / 0.4)'}`,
+                  boxShadow: product.verified ? '0 0 15px hsl(280 100% 60% / 0.3)' : 'none',
+                }}
+              >
+                <Shield className={`w-3 h-3 ${product.verified ? 'text-purple-400' : 'text-gray-500'}`} />
+                <span className={product.verified ? 'text-purple-400' : 'text-gray-500'}>
+                  {product.verified ? 'VERIFIED' : 'PENDING'}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Buyers count - bottom left */}
+            <motion.div
+              className="absolute pointer-events-none"
+              style={{ bottom: '-40px', left: '-15px', zIndex: 200 }}
+              initial={{ opacity: 0, y: -10, x: -10 }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
+              exit={{ opacity: 0, y: -10, x: -10 }}
+              transition={{ duration: 0.15, delay: 0.08 }}
+            >
+              <div 
+                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] whitespace-nowrap"
+                style={{
+                  background: 'hsl(0 0% 0% / 0.95)',
+                  border: '1px solid hsl(200 100% 50% / 0.6)',
+                  boxShadow: '0 0 15px hsl(200 100% 50% / 0.3)',
+                }}
+              >
+                <Users className="w-3 h-3 text-sky-400" />
+                <span className="text-sky-400">{product.buyers.toLocaleString()} bought</span>
+              </div>
+            </motion.div>
+
+            {/* Execute button - bottom right */}
+            <motion.div
+              className="absolute"
+              style={{ bottom: '-45px', right: '-15px', zIndex: 200 }}
+              initial={{ opacity: 0, y: -10, x: 10 }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
+              exit={{ opacity: 0, y: -10, x: 10 }}
               transition={{ duration: 0.15, delay: 0.1 }}
             >
               <CyberButton onClick={onBuy}>
-                <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
+                <ShoppingCart className="w-3 h-3 mr-1" />
                 EXECUTE
               </CyberButton>
             </motion.div>
