@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Terminal, Zap, Shield, TrendingUp } from "lucide-react";
 import { CyberButton } from "./CyberButton";
-import { TypingText } from "./TypingText";
+import { TypingText, CyclingTypingText } from "./TypingText";
+
+const heroMessages = [
+  ">> Initializing sustainable commerce protocol... ECO Token rewards activated.",
+  ">> Syncing with Sui blockchain... Smart contracts verified.",
+  ">> Scanning eco-products database... 500+ green items indexed.",
+  ">> Calculating carbon offset... 2.5M kg CO₂ reduced globally.",
+];
 
 export const CyberpunkHero = () => {
   const [glitchTitle, setGlitchTitle] = useState(false);
@@ -52,16 +59,17 @@ export const CyberpunkHero = () => {
           </span>
         </motion.h1>
 
-        {/* Typing subtitle */}
+        {/* Cycling typing subtitle */}
         <motion.div
-          className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 font-mono"
+          className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 font-mono h-14 flex items-center justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <TypingText
-            text=">> Initializing sustainable commerce protocol... ECO Token rewards activated."
-            speed={30}
+          <CyclingTypingText
+            messages={heroMessages}
+            speed={25}
+            pauseDuration={15000}
           />
         </motion.div>
 

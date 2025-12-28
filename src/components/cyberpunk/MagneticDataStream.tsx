@@ -4,6 +4,7 @@ import { Terminal, Zap, ShoppingCart, Shield, Star, Users } from "lucide-react";
 import gsap from "gsap";
 import { CyberButton } from "./CyberButton";
 import { ConductiveGrid } from "./ConductiveGrid";
+import { ProductDetailModal } from "./ProductDetailModal";
 import product1 from "@/assets/product-1.jpg";
 import product2 from "@/assets/product-2.jpg";
 import product3 from "@/assets/product-3.jpg";
@@ -311,19 +312,23 @@ const DataPacket = ({
           />
         )}
 
-        {/* Product image - larger with soft shadow */}
+        {/* Product image - larger, centered with soft shadow */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 overflow-hidden rounded-lg"
+          className="absolute overflow-hidden rounded-lg"
           style={{
-            top: '28px',
-            width: '100px',
-            height: '100px',
+            top: '50%',
+            left: '50%',
+            transform: isHovered 
+              ? 'translate(-50%, -58%) scale(1.08)' 
+              : 'translate(-50%, -58%) scale(1)',
+            width: '120px',
+            height: '120px',
             boxShadow: isHovered 
-              ? '0 6px 20px hsl(0 0% 0% / 0.5), 0 0 12px hsl(120 70% 50% / 0.25)'
-              : '0 4px 12px hsl(0 0% 0% / 0.4)',
-            border: '1px solid hsl(120 50% 40% / 0.3)',
-            transition: 'box-shadow 0.25s, transform 0.25s',
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+              ? '0 8px 28px hsl(0 0% 0% / 0.6), 0 0 16px hsl(120 70% 50% / 0.3)'
+              : '0 4px 16px hsl(0 0% 0% / 0.5)',
+            border: '2px solid hsl(120 50% 45% / 0.5)',
+            transition: 'box-shadow 0.25s, transform 0.25s, border-color 0.25s',
+            borderColor: isHovered ? 'hsl(120 70% 55%)' : 'hsl(120 50% 45% / 0.5)',
           }}
         >
           <img
@@ -332,33 +337,35 @@ const DataPacket = ({
             className="w-full h-full object-cover"
             style={{
               filter: isHovered 
-                ? 'brightness(1.05) saturate(1.1)' 
+                ? 'brightness(1.1) saturate(1.15)' 
                 : isGlitching 
                   ? 'hue-rotate(90deg) saturate(2)' 
-                  : 'brightness(0.9) saturate(0.95)',
+                  : 'brightness(0.95) saturate(1)',
               transition: 'filter 0.25s, transform 0.25s',
-              transform: isHovered ? 'scale(1.08)' : 'scale(1)',
+              transform: isHovered ? 'scale(1.1)' : 'scale(1)',
             }}
           />
         </div>
 
-        {/* Product info - improved typography */}
-        <div className="absolute bottom-7 left-0 right-0 text-center px-4">
+        {/* Product info - improved typography, positioned at bottom */}
+        <div className="absolute bottom-5 left-0 right-0 text-center px-3">
           <h3
             className="text-sm font-semibold tracking-wide truncate"
             style={{
               fontFamily: 'system-ui, -apple-system, sans-serif',
-              color: isHovered ? 'hsl(0 0% 100%)' : 'hsl(0 0% 88%)',
+              color: isHovered ? 'hsl(0 0% 100%)' : 'hsl(0 0% 90%)',
               transition: 'color 0.25s',
+              textShadow: '0 1px 3px hsl(0 0% 0% / 0.5)',
             }}
           >
             {product.name}
           </h3>
           <p
-            className="text-base font-bold mt-1"
+            className="text-base font-bold mt-0.5"
             style={{
-              color: isHovered ? 'hsl(120 80% 70%)' : 'hsl(120 60% 60%)',
+              color: isHovered ? 'hsl(120 85% 72%)' : 'hsl(120 65% 62%)',
               transition: 'color 0.25s',
+              textShadow: '0 0 8px hsl(120 70% 50% / 0.4)',
             }}
           >
             {product.price.toLocaleString()}đ
@@ -763,6 +770,21 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
 export const MagneticDataStream = () => {
   const productPositionsRef = useRef<{ x: number; y: number }[]>([]);
   const [, forceUpdate] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleProductClick = useCallback((productId: number) => {
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setIsModalOpen(true);
+    }
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedProduct(null), 200);
+  }, []);
 
   const handleBuy = useCallback((productId: number) => {
     console.log(`Executing purchase for product ${productId}`);
@@ -776,7 +798,7 @@ export const MagneticDataStream = () => {
   // Update grid positions periodically without causing infinite loop
   useEffect(() => {
     const interval = setInterval(() => {
-      forceUpdate(n => n + 1);
+      forceUpdate((n) => n + 1);
     }, 500);
     return () => clearInterval(interval);
   }, []);
@@ -825,21 +847,21 @@ export const MagneticDataStream = () => {
           products={row1} 
           direction="left" 
           rowIndex={0}
-          onBuy={handleBuy}
+          onBuy={handleProductClick}
           onProductPositionsUpdate={handlePositionsUpdate}
         />
         <DataStreamRow 
           products={row2} 
           direction="right" 
           rowIndex={1}
-          onBuy={handleBuy}
+          onBuy={handleProductClick}
           onProductPositionsUpdate={handlePositionsUpdate}
         />
         <DataStreamRow 
           products={row3} 
           direction="left" 
           rowIndex={2}
-          onBuy={handleBuy}
+          onBuy={handleProductClick}
           onProductPositionsUpdate={handlePositionsUpdate}
         />
       </div>
@@ -858,6 +880,14 @@ export const MagneticDataStream = () => {
           background: 'hsl(180 100% 50% / 0.05)',
           filter: 'blur(120px)',
         }}
+      />
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onBuy={handleBuy}
       />
 
       {/* Custom keyframes */}
