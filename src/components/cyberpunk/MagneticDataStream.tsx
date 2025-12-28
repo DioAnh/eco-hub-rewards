@@ -40,6 +40,10 @@ const row1 = products.slice(0, 8);
 const row2 = products.slice(8, 16);
 const row3 = products.slice(16, 24);
 
+// Layout constants (must match rendered card width + flex gap to avoid drift/overlap)
+const DATA_PACKET_WIDTH_PX = 176; // tailwind w-44
+const DATA_PACKET_GAP_PX = 40;
+
 // Simplex noise function for organic movement
 const simplex2D = (x: number, y: number): number => {
   // Simplified noise approximation using sine waves
@@ -579,9 +583,9 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
   useEffect(() => {
     if (!rowRef.current) return;
 
-    const itemWidth = 210;
-    const totalWidth = products.length * itemWidth;
-    const burstDistance = itemWidth;
+    const itemStep = DATA_PACKET_WIDTH_PX + DATA_PACKET_GAP_PX;
+    const totalWidth = products.length * itemStep;
+    const burstDistance = itemStep;
     
     // Initial position
     if (direction === 'left') {
@@ -755,10 +759,10 @@ const DataStreamRow = ({ products, direction, rowIndex, onBuy, onProductPosition
         ref={rowRef}
         className="flex items-center"
         style={{ 
-          gap: '40px',
+          gap: `${DATA_PACKET_GAP_PX}px`,
           width: 'fit-content',
-          paddingLeft: '40px',
-          paddingRight: '40px',
+          paddingLeft: `${DATA_PACKET_GAP_PX}px`,
+          paddingRight: `${DATA_PACKET_GAP_PX}px`,
           transformOrigin: 'center center',
         }}
       >

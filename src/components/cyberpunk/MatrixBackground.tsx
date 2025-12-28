@@ -246,10 +246,10 @@ export const MatrixBackground = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black" style={{ zIndex: -10 }}>
+    <div className="fixed inset-0 bg-black pointer-events-none" style={{ zIndex: -10 }}>
       {/* Scanlines overlay */}
       <div className="absolute inset-0 scanlines pointer-events-none" style={{ zIndex: 1 }} />
-      
+
       {/* Vignette */}
       <div 
         className="absolute inset-0 pointer-events-none"
@@ -258,11 +258,11 @@ export const MatrixBackground = () => {
           zIndex: 2,
         }}
       />
-      
+
       <Canvas
         camera={{ position: [0, 0, 15], fov: 60 }}
         gl={{ antialias: true, alpha: false }}
-        style={{ background: "#000000" }}
+        style={{ background: "#000000", pointerEvents: "none" }}
       >
         <color attach="background" args={["#000000"]} />
         

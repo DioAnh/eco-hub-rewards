@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Terminal, 
   ShoppingBag, 
@@ -29,6 +30,12 @@ const menuItems: MenuItem[] = [
 
 export const CyberMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
+
+  const startAngle = -20;
+  const endAngle = -160;
+  const angleStep = menuItems.length > 1 ? (endAngle - startAngle) / (menuItems.length - 1) : 0;
+  const menuRadius = isMobile ? 104 : 120;
 
   return (
     <div className="fixed bottom-8 right-8 z-50">
@@ -41,9 +48,9 @@ export const CyberMenu = () => {
               style={{ transform: "translate(30%, 30%)" }}
             >
               {menuItems.map((_, index) => {
-                const angle = -30 - index * 25;
+                const angle = startAngle + index * angleStep;
                 const radian = (angle * Math.PI) / 180;
-                const length = 90;
+                const length = menuRadius;
                 const endX = 128 + Math.cos(radian) * length;
                 const endY = 128 + Math.sin(radian) * length;
                 
@@ -54,7 +61,7 @@ export const CyberMenu = () => {
                     y1="128"
                     x2={endX}
                     y2={endY}
-                    stroke="hsl(120 100% 50%)"
+                    stroke="hsl(var(--primary))"
                     strokeWidth="1"
                     strokeDasharray="4 4"
                     initial={{ pathLength: 0, opacity: 0 }}
@@ -68,11 +75,10 @@ export const CyberMenu = () => {
 
             {/* Menu items */}
             {menuItems.map((item, index) => {
-              const angle = -30 - index * 25;
+              const angle = startAngle + index * angleStep;
               const radian = (angle * Math.PI) / 180;
-              const radius = 90;
-              const x = Math.cos(radian) * radius;
-              const y = Math.sin(radian) * radius;
+              const x = Math.cos(radian) * menuRadius;
+              const y = Math.sin(radian) * menuRadius;
 
               return (
                 <motion.div
@@ -95,7 +101,7 @@ export const CyberMenu = () => {
                   <Link
                     to={item.href}
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 bg-black/90 border border-primary/50 hover:border-primary hover:bg-primary/10 transition-all font-mono text-xs uppercase tracking-wider text-primary"
+                    className="flex items-center gap-2 px-4 py-2 bg-background/90 border border-primary/50 hover:border-primary hover:bg-primary/10 transition-all font-mono text-xs uppercase tracking-wider text-primary whitespace-nowrap"
                     style={{
                       clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
                     }}
@@ -113,10 +119,10 @@ export const CyberMenu = () => {
       {/* Main trigger button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-14 h-14 flex items-center justify-center bg-black border-2 border-primary text-primary"
+        className="relative w-14 h-14 flex items-center justify-center bg-background border-2 border-primary text-primary"
         style={{
           clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-          boxShadow: isOpen ? "0 0 30px hsl(120 100% 50% / 0.5)" : "0 0 15px hsl(120 100% 50% / 0.3)",
+          boxShadow: isOpen ? "0 0 30px hsl(var(--primary) / 0.5)" : "0 0 15px hsl(var(--primary) / 0.3)",
         }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
