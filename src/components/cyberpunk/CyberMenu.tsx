@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Terminal, 
   ShoppingBag, 
-  Wallet, 
-  Gamepad2, 
-  Code, 
   X,
   Leaf,
-  FileText
+  FileText,
+  Coins,
+  Book,
+  Store
 } from "lucide-react";
 
 interface MenuItem {
@@ -21,8 +21,10 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { icon: <ShoppingBag className="w-5 h-5" />, label: "MARKET", href: "/marketplace" },
   { icon: <Leaf className="w-5 h-5" />, label: "ECO_SCORE", href: "/eco-score" },
-  { icon: <Wallet className="w-5 h-5" />, label: "STAKING", href: "/staking" },
+  { icon: <Coins className="w-5 h-5" />, label: "STAKING", href: "/staking" },
   { icon: <FileText className="w-5 h-5" />, label: "WHITEPAPER", href: "/whitepaper" },
+  { icon: <Book className="w-5 h-5" />, label: "DOCS", href: "/docs" },
+  { icon: <Store className="w-5 h-5" />, label: "LISTING", href: "/listing-guide" },
 ];
 
 export const CyberMenu = () => {

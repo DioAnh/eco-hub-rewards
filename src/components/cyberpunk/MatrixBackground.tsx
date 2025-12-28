@@ -246,15 +246,16 @@ export const MatrixBackground = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 -z-10 bg-black">
+    <div className="fixed inset-0 bg-black" style={{ zIndex: -10 }}>
       {/* Scanlines overlay */}
-      <div className="absolute inset-0 scanlines pointer-events-none" />
+      <div className="absolute inset-0 scanlines pointer-events-none" style={{ zIndex: 1 }} />
       
       {/* Vignette */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.8) 100%)"
+          background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.8) 100%)",
+          zIndex: 2,
         }}
       />
       

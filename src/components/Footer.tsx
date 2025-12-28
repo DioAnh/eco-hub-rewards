@@ -1,29 +1,28 @@
+import { Link } from "react-router-dom";
 import { Leaf } from "lucide-react";
 
 const Footer = () => {
   const links = {
     product: [
-      { label: "Marketplace", href: "#marketplace" },
-      { label: "Eco-Score", href: "#eco-score" },
-      { label: "Green Avatar", href: "#avatar" },
-      { label: "Staking Vault", href: "#" },
+      { label: "Marketplace", href: "/marketplace" },
+      { label: "Eco-Score", href: "/eco-score" },
+      { label: "Staking Vault", href: "/staking" },
+      { label: "Whitepaper", href: "/whitepaper" },
     ],
     resources: [
-      { label: "Documentation", href: "#" },
-      { label: "Whitepaper", href: "#" },
-      { label: "API Reference", href: "#" },
-      { label: "Smart Contracts", href: "#" },
+      { label: "Documentation", href: "/docs" },
+      { label: "Blog", href: "/blog" },
+      { label: "API Reference", href: "/docs" },
+      { label: "Smart Contracts", href: "/docs" },
     ],
     company: [
-      { label: "Về chúng tôi", href: "#" },
-      { label: "Blog", href: "#" },
-      { label: "Careers", href: "#" },
-      { label: "Liên hệ", href: "#" },
+      { label: "Về chúng tôi", href: "/whitepaper" },
+      { label: "Cách niêm yết sản phẩm", href: "/listing-guide" },
+      { label: "Liên hệ", href: "/docs" },
     ],
     legal: [
-      { label: "Điều khoản sử dụng", href: "#" },
-      { label: "Chính sách bảo mật", href: "#" },
-      { label: "Cookie Policy", href: "#" },
+      { label: "Điều khoản sử dụng", href: "/terms" },
+      { label: "Chính sách bảo mật", href: "/terms" },
     ],
   };
 
@@ -32,18 +31,20 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           <div className="col-span-2 md:col-span-1">
-            <a href="/" className="flex items-center gap-2 mb-4">
+            <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <Leaf className="w-6 h-6 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">EcoShop</span>
-            </a>
+            </Link>
             <p className="text-sm text-muted-foreground mb-4">
               Circular Economy Hub trên Sui Network. Tài chính hóa hành vi giảm phát thải CO₂.
             </p>
             <div className="flex gap-3">
               <a
-                href="#"
+                href="https://twitter.com/ecoshop"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Twitter"
               >
@@ -52,7 +53,9 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://discord.gg/ecoshop"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Discord"
               >
@@ -61,7 +64,9 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://t.me/ecoshop"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Telegram"
               >
@@ -77,9 +82,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {links.product.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -90,9 +95,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {links.resources.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -103,9 +108,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {links.company.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -116,9 +121,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {links.legal.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -131,7 +136,7 @@ const Footer = () => {
           </p>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Powered by</span>
-            <span className="font-semibold text-sui">Sui</span>
+            <span className="font-semibold text-[#6fbcf0]">Sui</span>
             <span>&</span>
             <span className="font-semibold text-primary">Move</span>
           </div>

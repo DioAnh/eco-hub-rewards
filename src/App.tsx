@@ -13,6 +13,10 @@ import EcoScorePage from "./pages/EcoScorePage";
 import StakingPage from "./pages/StakingPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
 import MarketplacePage from "./pages/MarketplacePage";
+import BlogPage from "./pages/BlogPage";
+import DocsPage from "./pages/DocsPage";
+import TermsPage from "./pages/TermsPage";
+import ListingGuidePage from "./pages/ListingGuidePage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +35,10 @@ const App = () => (
                 <Route path="/staking" element={<StakingPage />} />
                 <Route path="/whitepaper" element={<WhitepaperPage />} />
                 <Route path="/marketplace" element={<MarketplacePage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/docs" element={<DocsPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/listing-guide" element={<ListingGuidePage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

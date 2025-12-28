@@ -318,7 +318,7 @@ const Scene = ({ productPositions = [] }: ConductiveGridProps) => {
 
 export const ConductiveGrid = ({ productPositions = [] }: ConductiveGridProps) => {
   return (
-    <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+    <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
       <Canvas
         camera={{ position: [0, 0, 10], fov: 50 }}
         gl={{ alpha: true, antialias: true }}
