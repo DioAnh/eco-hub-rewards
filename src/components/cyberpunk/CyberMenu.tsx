@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { 
-  Terminal, 
-  ShoppingBag, 
+import {
+  Terminal,
+  ShoppingBag,
   X,
   Leaf,
   FileText,
   Coins,
   Book,
-  Store
+  Store,
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MenuItem {
   icon: React.ReactNode;
@@ -31,101 +31,53 @@ const menuItems: MenuItem[] = [
 export const CyberMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
-
-  const startAngle = -20;
-  const endAngle = -160;
-  const angleStep = menuItems.length > 1 ? (endAngle - startAngle) / (menuItems.length - 1) : 0;
-  const menuRadius = isMobile ? 104 : 120;
+  const panelWidthClass = isMobile ? "w-48" : "w-56";
 
   return (
     <div className="fixed bottom-8 right-8 z-50">
       <AnimatePresence>
         {isOpen && (
-          <>
-            {/* Connection lines */}
-            <svg
-              className="absolute bottom-0 right-0 w-64 h-64 pointer-events-none"
-              style={{ transform: "translate(30%, 30%)" }}
-            >
-              {menuItems.map((_, index) => {
-                const angle = startAngle + index * angleStep;
-                const radian = (angle * Math.PI) / 180;
-                const length = menuRadius;
-                const endX = 128 + Math.cos(radian) * length;
-                const endY = 128 + Math.sin(radian) * length;
-                
-                return (
-                  <motion.line
-                    key={index}
-                    x1="128"
-                    y1="128"
-                    x2={endX}
-                    y2={endY}
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="1"
-                    strokeDasharray="4 4"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 0.5 }}
-                    exit={{ pathLength: 0, opacity: 0 }}
-                    transition={{ delay: index * 0.05, duration: 0.3 }}
-                  />
-                );
-              })}
-            </svg>
-
-            {/* Menu items */}
-            {menuItems.map((item, index) => {
-              const angle = startAngle + index * angleStep;
-              const radian = (angle * Math.PI) / 180;
-              const x = Math.cos(radian) * menuRadius;
-              const y = Math.sin(radian) * menuRadius;
-
-              return (
-                <motion.div
-                  key={item.label}
-                  className="absolute"
-                  style={{
-                    bottom: 28,
-                    right: 28,
-                  }}
-                  initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
-                  animate={{ x, y, opacity: 1, scale: 1 }}
-                  exit={{ x: 0, y: 0, opacity: 0, scale: 0 }}
-                  transition={{ 
-                    delay: index * 0.05,
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 20
-                  }}
-                >
-                  <Link
-                    to={item.href}
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 bg-background/90 border border-primary/50 hover:border-primary hover:bg-primary/10 transition-all font-mono text-xs uppercase tracking-wider text-primary whitespace-nowrap"
-                    style={{
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                    }}
-                  >
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </>
+          <motion.div
+            key="menu"
+            className="absolute bottom-20 right-0 flex flex-col items-end gap-2 overflow-y-auto"
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            style={{ maxHeight: "calc(100vh - 10rem)" }}
+          >
+            {menuItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.href}
+                onClick={() => setIsOpen(false)}
+                className={`flex ${panelWidthClass} items-center gap-2 px-4 py-2 bg-background/90 border border-primary/50 hover:border-primary hover:bg-primary/10 transition-all font-mono text-xs uppercase tracking-wider text-primary whitespace-nowrap`}
+                style={{
+                  clipPath:
+                    "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                }}
+              >
+                {item.icon}
+                <span className="flex-1">{item.label}</span>
+              </Link>
+            ))}
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Main trigger button */}
       <motion.button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((v) => !v)}
         className="relative w-14 h-14 flex items-center justify-center bg-background border-2 border-primary text-primary"
         style={{
-          clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-          boxShadow: isOpen ? "0 0 30px hsl(var(--primary) / 0.5)" : "0 0 15px hsl(var(--primary) / 0.3)",
+          clipPath:
+            "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+          boxShadow: isOpen
+            ? "0 0 30px hsl(var(--primary) / 0.5)"
+            : "0 0 15px hsl(var(--primary) / 0.3)",
         }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        aria-label={isOpen ? "Close menu" : "Open menu"}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -149,11 +101,11 @@ export const CyberMenu = () => {
           )}
         </AnimatePresence>
 
-        {/* Pulse ring */}
         <motion.div
           className="absolute inset-0 border border-primary/40"
           style={{
-            clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+            clipPath:
+              "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
           }}
           animate={{
             scale: [1, 1.3, 1],
