@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Terminal, 
@@ -6,7 +7,9 @@ import {
   Wallet, 
   Gamepad2, 
   Code, 
-  X 
+  X,
+  Leaf,
+  FileText
 } from "lucide-react";
 
 interface MenuItem {
@@ -16,10 +19,10 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { icon: <ShoppingBag className="w-5 h-5" />, label: "MARKET", href: "#marketplace" },
-  { icon: <Wallet className="w-5 h-5" />, label: "WALLET", href: "#wallet" },
-  { icon: <Gamepad2 className="w-5 h-5" />, label: "GAME", href: "#avatar" },
-  { icon: <Code className="w-5 h-5" />, label: "PROTOCOL", href: "#protocol" },
+  { icon: <ShoppingBag className="w-5 h-5" />, label: "MARKET", href: "/marketplace" },
+  { icon: <Leaf className="w-5 h-5" />, label: "ECO_SCORE", href: "/eco-score" },
+  { icon: <Wallet className="w-5 h-5" />, label: "STAKING", href: "/staking" },
+  { icon: <FileText className="w-5 h-5" />, label: "WHITEPAPER", href: "/whitepaper" },
 ];
 
 export const CyberMenu = () => {
@@ -70,15 +73,12 @@ export const CyberMenu = () => {
               const y = Math.sin(radian) * radius;
 
               return (
-                <motion.a
+                <motion.div
                   key={item.label}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="absolute flex items-center gap-2 px-4 py-2 bg-black/90 border border-primary/50 hover:border-primary hover:bg-primary/10 transition-all font-mono text-xs uppercase tracking-wider text-primary"
+                  className="absolute"
                   style={{
                     bottom: 28,
                     right: 28,
-                    clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
                   }}
                   initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
                   animate={{ x, y, opacity: 1, scale: 1 }}
@@ -89,11 +89,19 @@ export const CyberMenu = () => {
                     stiffness: 300,
                     damping: 20
                   }}
-                  whileHover={{ scale: 1.05 }}
                 >
-                  {item.icon}
-                  <span>{item.label}</span>
-                </motion.a>
+                  <Link
+                    to={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 bg-black/90 border border-primary/50 hover:border-primary hover:bg-primary/10 transition-all font-mono text-xs uppercase tracking-wider text-primary"
+                    style={{
+                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                    }}
+                  >
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </Link>
+                </motion.div>
               );
             })}
           </>
