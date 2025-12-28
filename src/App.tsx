@@ -9,6 +9,10 @@ import { networkConfig } from "@/lib/sui-config";
 import "@mysten/dapp-kit/dist/index.css";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import EcoScorePage from "./pages/EcoScorePage";
+import StakingPage from "./pages/StakingPage";
+import WhitepaperPage from "./pages/WhitepaperPage";
+import MarketplacePage from "./pages/MarketplacePage";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +27,10 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="/eco-score" element={<EcoScorePage />} />
+                <Route path="/staking" element={<StakingPage />} />
+                <Route path="/whitepaper" element={<WhitepaperPage />} />
+                <Route path="/marketplace" element={<MarketplacePage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
