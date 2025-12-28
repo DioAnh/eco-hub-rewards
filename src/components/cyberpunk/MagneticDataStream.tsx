@@ -41,8 +41,8 @@ const row2 = products.slice(8, 16);
 const row3 = products.slice(16, 24);
 
 // Layout constants (must match rendered card width + flex gap to avoid drift/overlap)
-const DATA_PACKET_WIDTH_PX = 176; // tailwind w-44
-const DATA_PACKET_GAP_PX = 40;
+const DATA_PACKET_WIDTH_PX = 200; // slightly larger card
+const DATA_PACKET_GAP_PX = 56;    // more spacing between cards
 
 // Simplex noise function for organic movement
 const simplex2D = (x: number, y: number): number => {
@@ -183,12 +183,12 @@ const DataPacket = ({
     }
   }, [isGlitching]);
 
-  // Kinetic aura intensity based on velocity
-  const auraIntensity = Math.min(velocity * 0.5, 1);
+  // Kinetic aura intensity based on velocity - reduced
+  const auraIntensity = Math.min(velocity * 0.3, 0.6);
 
-  // Combine all transforms
+  // Combine all transforms - gentler hover scale
   const kineticTransform = isHovered 
-    ? 'scale(1.25) translateY(0) translateX(0) rotate(0deg)'
+    ? 'scale(1.08) translateY(-4px) translateX(0) rotate(0deg)'
     : `scale(1) translateY(${sineY + noiseY}px) translateX(${noiseX}px) rotate(${rotationZ}deg)`;
 
   return (
@@ -208,34 +208,34 @@ const DataPacket = ({
         transform: kineticTransform,
         zIndex: isHovered ? 100 : 1,
         transition: isHovered 
-          ? 'transform 0.3s ease-out, z-index 0s' 
-          : 'transform 0.15s ease-out, z-index 0s 0.3s',
+          ? 'transform 0.25s ease-out, z-index 0s' 
+          : 'transform 0.2s ease-out, z-index 0s 0.25s',
         willChange: 'transform',
       }}
     >
-      {/* Shockwave pulse */}
+      {/* Shockwave pulse - reduced intensity */}
       <AnimatePresence>
         {pulseActive && (
           <motion.div
             className="absolute inset-0 pointer-events-none"
             style={{ zIndex: -1 }}
-            initial={{ scale: 0.8, opacity: 0.8 }}
-            animate={{ scale: 3, opacity: 0 }}
+            initial={{ scale: 0.9, opacity: 0.5 }}
+            animate={{ scale: 2, opacity: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <div 
               className="absolute inset-0 rounded-full"
               style={{
-                border: '2px solid hsl(120 100% 50% / 0.6)',
-                boxShadow: '0 0 20px hsl(120 100% 50% / 0.4)',
+                border: '1px solid hsl(120 80% 50% / 0.3)',
+                boxShadow: '0 0 10px hsl(120 80% 50% / 0.2)',
               }}
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Electric trail effect */}
+      {/* Electric trail effect - reduced */}
       <div 
         ref={trailRef}
         className="absolute pointer-events-none"
@@ -243,152 +243,127 @@ const DataPacket = ({
           right: '100%',
           top: '50%',
           transform: 'translateY(-50%)',
-          width: `${60 + velocity * 40}px`,
-          height: '3px',
-          background: `linear-gradient(90deg, transparent, hsl(120 100% 50% / ${0.3 + auraIntensity * 0.5}), hsl(120 100% 70% / ${0.6 + auraIntensity * 0.4}))`,
-          boxShadow: `0 0 ${10 + velocity * 15}px hsl(120 100% 50% / ${0.4 + auraIntensity * 0.4})`,
-          filter: 'blur(1px)',
-          opacity: isHovered ? 0 : 1,
+          width: `${30 + velocity * 20}px`,
+          height: '2px',
+          background: `linear-gradient(90deg, transparent, hsl(120 70% 50% / ${0.15 + auraIntensity * 0.25}))`,
+          boxShadow: `0 0 ${5 + velocity * 8}px hsl(120 70% 50% / ${0.2 + auraIntensity * 0.2})`,
+          filter: 'blur(0.5px)',
+          opacity: isHovered ? 0 : 0.7,
           transition: 'opacity 0.3s',
         }}
       />
-      
-      {/* Secondary electric arcs */}
-      {velocity > 0.3 && (
-        <>
-          <div 
-            className="absolute pointer-events-none"
-            style={{
-              right: '100%',
-              top: '40%',
-              width: `${30 + velocity * 20}px`,
-              height: '1px',
-              background: `linear-gradient(90deg, transparent, hsl(180 100% 50% / 0.5))`,
-              transform: 'rotate(-15deg)',
-              opacity: auraIntensity * 0.7,
-            }}
-          />
-          <div 
-            className="absolute pointer-events-none"
-            style={{
-              right: '100%',
-              top: '60%',
-              width: `${25 + velocity * 15}px`,
-              height: '1px',
-              background: `linear-gradient(90deg, transparent, hsl(180 100% 50% / 0.4))`,
-              transform: 'rotate(20deg)',
-              opacity: auraIntensity * 0.6,
-            }}
-          />
-        </>
-      )}
 
-      {/* Kinetic Aura - outer energy shell */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle, hsl(120 100% 50% / ${0.1 + auraIntensity * 0.3}) 0%, transparent 70%)`,
-          filter: `blur(${15 + auraIntensity * 10}px)`,
-          transform: 'scale(1.8)',
-          opacity: isHovered ? 1.5 : 1,
-          transition: 'opacity 0.3s',
-        }}
-      />
-      
-      {/* Outer glow */}
+      {/* Outer glow - softer */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: isHovered
-            ? 'radial-gradient(circle, hsl(120 100% 50% / 0.5) 0%, transparent 70%)'
-            : `radial-gradient(circle, hsl(120 100% 50% / ${0.15 + auraIntensity * 0.2}) 0%, transparent 70%)`,
-          filter: 'blur(25px)',
-          transform: 'scale(1.6)',
+            ? 'radial-gradient(circle, hsl(120 60% 50% / 0.25) 0%, transparent 70%)'
+            : `radial-gradient(circle, hsl(120 60% 50% / ${0.05 + auraIntensity * 0.08}) 0%, transparent 70%)`,
+          filter: 'blur(20px)',
+          transform: 'scale(1.4)',
         }}
       />
 
-      {/* Main hexagon container */}
+      {/* Main hexagon container - larger, improved styling */}
       <div
-        className="relative w-44 h-52 overflow-visible"
+        className="relative overflow-visible"
         style={{
+          width: '200px',
+          height: '240px',
           clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
           background: isGlitching 
-            ? 'linear-gradient(180deg, hsl(120 100% 20% / 0.5) 0%, hsl(0 0% 0%) 100%)'
-            : 'linear-gradient(180deg, hsl(180 15% 8%) 0%, hsl(0 0% 0%) 100%)',
+            ? 'linear-gradient(180deg, hsl(120 20% 12% / 0.8) 0%, hsl(0 0% 4%) 100%)'
+            : 'linear-gradient(180deg, hsl(200 10% 10%) 0%, hsl(0 0% 6%) 100%)',
           boxShadow: isHovered
-            ? '0 0 40px hsl(120 100% 50% / 0.6), inset 0 0 30px hsl(120 100% 50% / 0.15)'
-            : `0 0 ${15 + auraIntensity * 20}px hsl(120 100% 50% / ${0.25 + auraIntensity * 0.2})`,
+            ? '0 8px 32px hsl(0 0% 0% / 0.5), 0 0 20px hsl(120 70% 50% / 0.3)'
+            : '0 4px 16px hsl(0 0% 0% / 0.4)',
+          transition: 'box-shadow 0.25s ease-out',
         }}
       >
-        {/* Neon border */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-            border: isHovered ? '2px solid hsl(120 100% 50%)' : `1px solid hsl(120 100% ${35 + auraIntensity * 20}%)`,
-            boxShadow: isHovered ? 'inset 0 0 20px hsl(120 100% 50% / 0.3)' : 'none',
-          }}
-        />
+        {/* Neon border - SVG for all 6 sides */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          viewBox="0 0 200 240"
+          preserveAspectRatio="none"
+        >
+          <polygon
+            points="100,0 200,60 200,180 100,240 0,180 0,60"
+            fill="none"
+            stroke={isHovered ? "hsl(120, 80%, 55%)" : "hsl(120, 60%, 35%)"}
+            strokeWidth={isHovered ? 2 : 1}
+            style={{
+              filter: isHovered ? 'drop-shadow(0 0 6px hsl(120 80% 55%))' : 'none',
+              transition: 'stroke 0.25s, stroke-width 0.25s, filter 0.25s',
+            }}
+          />
+        </svg>
 
         {/* Scan effect line */}
         {isHovered && (
           <div
             ref={scanLineRef}
-            className="absolute left-0 right-0 h-1 pointer-events-none z-20"
+            className="absolute left-0 right-0 h-0.5 pointer-events-none z-20"
             style={{
-              background: 'linear-gradient(90deg, transparent, hsl(120 100% 50%), transparent)',
-              boxShadow: '0 0 20px hsl(120 100% 50%)',
+              background: 'linear-gradient(90deg, transparent, hsl(120 80% 60%), transparent)',
+              boxShadow: '0 0 12px hsl(120 80% 60%)',
             }}
           />
         )}
 
-        {/* Grid overlay */}
+        {/* Product image - larger with soft shadow */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-25"
+          className="absolute left-1/2 -translate-x-1/2 overflow-hidden rounded-lg"
           style={{
-            backgroundImage: `
-              linear-gradient(hsl(120 100% 50% / 0.2) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(120 100% 50% / 0.2) 1px, transparent 1px)
-            `,
-            backgroundSize: '10px 10px',
+            top: '28px',
+            width: '100px',
+            height: '100px',
+            boxShadow: isHovered 
+              ? '0 6px 20px hsl(0 0% 0% / 0.5), 0 0 12px hsl(120 70% 50% / 0.25)'
+              : '0 4px 12px hsl(0 0% 0% / 0.4)',
+            border: '1px solid hsl(120 50% 40% / 0.3)',
+            transition: 'box-shadow 0.25s, transform 0.25s',
+            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
           }}
-        />
-
-        {/* Product image */}
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 w-20 h-20 overflow-hidden border border-primary/40 rounded">
+        >
           <img
             src={product.image}
             alt={product.name}
             className="w-full h-full object-cover"
             style={{
               filter: isHovered 
-                ? 'none' 
+                ? 'brightness(1.05) saturate(1.1)' 
                 : isGlitching 
                   ? 'hue-rotate(90deg) saturate(2)' 
-                  : 'grayscale(40%) brightness(0.75)',
-              transition: 'filter 0.2s',
+                  : 'brightness(0.9) saturate(0.95)',
+              transition: 'filter 0.25s, transform 0.25s',
+              transform: isHovered ? 'scale(1.08)' : 'scale(1)',
             }}
           />
-          {isHovered && (
-            <div className="absolute inset-0 bg-primary/15 mix-blend-overlay animate-pulse" />
-          )}
         </div>
 
-        {/* Product info */}
-        <div className="absolute bottom-6 left-0 right-0 text-center px-3">
-          <h3 className="font-mono text-[10px] text-primary truncate uppercase tracking-wider">
+        {/* Product info - improved typography */}
+        <div className="absolute bottom-7 left-0 right-0 text-center px-4">
+          <h3
+            className="text-sm font-semibold tracking-wide truncate"
+            style={{
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              color: isHovered ? 'hsl(0 0% 100%)' : 'hsl(0 0% 88%)',
+              transition: 'color 0.25s',
+            }}
+          >
             {product.name}
           </h3>
-          <p className="font-mono text-primary text-xs mt-1 neon-text font-bold">
+          <p
+            className="text-base font-bold mt-1"
+            style={{
+              color: isHovered ? 'hsl(120 80% 70%)' : 'hsl(120 60% 60%)',
+              transition: 'color 0.25s',
+            }}
+          >
             {product.price.toLocaleString()}đ
           </p>
         </div>
-
-        {/* Corner decorations */}
-        <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-primary/60" />
-        <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-primary/60" />
-        <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-primary/60" />
-        <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-primary/60" />
       </div>
 
       {/* Hover info - positioned OUTSIDE the clipped container */}

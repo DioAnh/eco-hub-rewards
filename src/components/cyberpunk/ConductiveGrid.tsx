@@ -53,34 +53,34 @@ const gridFragmentShader = `
   uniform float uTime;
   uniform vec3 uProductPositions[8];
   uniform int uProductCount;
-  
+
   varying vec2 vUv;
   varying float vDistortion;
   varying float vNearProduct;
-  
+
   void main() {
-    // Grid pattern
-    vec2 grid = abs(fract(vUv * 20.0 - 0.5) - 0.5);
+    // Grid pattern - sparser grid (10 instead of 20)
+    vec2 grid = abs(fract(vUv * 10.0 - 0.5) - 0.5);
     float gridLine = min(grid.x, grid.y);
-    float gridAlpha = 1.0 - smoothstep(0.0, 0.05, gridLine);
-    
-    // Base grid color (dim green)
-    vec3 baseColor = vec3(0.0, 0.3, 0.0);
-    
-    // Brighten near products
-    vec3 brightColor = vec3(0.0, 1.0, 0.0);
-    vec3 finalColor = mix(baseColor, brightColor, vNearProduct * 0.8);
-    
-    // Add pulse effect
-    float pulse = sin(uTime * 3.0) * 0.5 + 0.5;
-    finalColor += brightColor * vNearProduct * pulse * 0.3;
-    
-    // Add intersection glow
-    float intersectionGlow = vDistortion * 0.5;
-    finalColor += vec3(0.0, 0.5, 0.3) * intersectionGlow;
-    
-    float alpha = gridAlpha * (0.15 + vNearProduct * 0.4 + vDistortion * 0.2);
-    
+    float gridAlpha = 1.0 - smoothstep(0.0, 0.04, gridLine);
+
+    // Base grid color - much dimmer
+    vec3 baseColor = vec3(0.0, 0.12, 0.0);
+
+    // Brighten near products - subtle
+    vec3 brightColor = vec3(0.0, 0.5, 0.0);
+    vec3 finalColor = mix(baseColor, brightColor, vNearProduct * 0.4);
+
+    // Subtle pulse effect
+    float pulse = sin(uTime * 2.0) * 0.5 + 0.5;
+    finalColor += brightColor * vNearProduct * pulse * 0.1;
+
+    // Subtle intersection glow
+    float intersectionGlow = vDistortion * 0.25;
+    finalColor += vec3(0.0, 0.2, 0.1) * intersectionGlow;
+
+    float alpha = gridAlpha * (0.06 + vNearProduct * 0.15 + vDistortion * 0.08);
+
     gl_FragColor = vec4(finalColor, alpha);
   }
 `;
