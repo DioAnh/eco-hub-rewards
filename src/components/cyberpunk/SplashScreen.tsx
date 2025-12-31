@@ -9,13 +9,14 @@ interface SplashScreenProps {
 
 const bootSequence = [
   { text: "> INITIALIZING ECOSHOP_PROTOCOL...", delay: 0 },
-  { text: "> LOADING SUSTAINABLE_COMMERCE_ENGINE...", delay: 400 },
-  { text: "> CONNECTING TO SUI_BLOCKCHAIN...", delay: 800 },
-  { text: "> VERIFYING SMART_CONTRACTS...", delay: 1200 },
-  { text: "> ECO_TOKEN MODULE LOADED ✓", delay: 1600 },
-  { text: "> MARKETPLACE MODULE LOADED ✓", delay: 1900 },
-  { text: "> STAKING_VAULT MODULE LOADED ✓", delay: 2200 },
-  { text: "> SYSTEM READY.", delay: 2500 },
+  { text: "> LOADING SUSTAINABLE_COMMERCE_ENGINE...", delay: 600 },
+  { text: "> CONNECTING TO SUI_BLOCKCHAIN...", delay: 1200 },
+  { text: "> VERIFYING SMART_CONTRACTS...", delay: 1800 },
+  { text: "> ECO_TOKEN MODULE LOADED ✓", delay: 2400 },
+  { text: "> MARKETPLACE MODULE LOADED ✓", delay: 2800 },
+  { text: "> STAKING_VAULT MODULE LOADED ✓", delay: 3200 },
+  { text: "> CARBON_OFFSET TRACKER ONLINE ✓", delay: 3600 },
+  { text: "> SYSTEM READY.", delay: 4000 },
 ];
 
 const TypingLine = ({ text, onComplete }: { text: string; onComplete?: () => void }) => {
@@ -52,7 +53,7 @@ const TypingLine = ({ text, onComplete }: { text: string; onComplete?: () => voi
   );
 };
 
-export const SplashScreen = ({ onComplete, duration = 5000 }: SplashScreenProps) => {
+export const SplashScreen = ({ onComplete, duration = 8000 }: SplashScreenProps) => {
   const [visibleLines, setVisibleLines] = useState<number[]>([]);
   const [showMainTitle, setShowMainTitle] = useState(false);
   const [showSubtitle, setShowSubtitle] = useState(false);
@@ -67,10 +68,10 @@ export const SplashScreen = ({ onComplete, duration = 5000 }: SplashScreenProps)
     });
 
     // Show main title after boot sequence
-    setTimeout(() => setShowMainTitle(true), 2800);
+    setTimeout(() => setShowMainTitle(true), 4500);
     
     // Show subtitle
-    setTimeout(() => setShowSubtitle(true), 3400);
+    setTimeout(() => setShowSubtitle(true), 5200);
 
     // Start fade out
     setTimeout(() => setFadeOut(true), duration - 500);

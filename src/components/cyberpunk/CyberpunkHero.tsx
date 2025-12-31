@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Terminal, Zap, Shield, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
 import { CyberButton } from "./CyberButton";
 import { TypingText, CyclingTypingText } from "./TypingText";
 
@@ -80,14 +81,18 @@ export const CyberpunkHero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
-          <CyberButton variant="primary">
-            <Zap className="w-5 h-5 mr-2" />
-            INITIALIZE
-          </CyberButton>
-          <CyberButton variant="secondary">
-            <Terminal className="w-5 h-5 mr-2" />
-            READ_DOCS
-          </CyberButton>
+          <Link to="/marketplace">
+            <CyberButton variant="primary">
+              <Zap className="w-5 h-5 mr-2" />
+              INITIALIZE
+            </CyberButton>
+          </Link>
+          <Link to="/docs">
+            <CyberButton variant="secondary">
+              <Terminal className="w-5 h-5 mr-2" />
+              READ_DOCS
+            </CyberButton>
+          </Link>
         </motion.div>
 
         {/* Stats - HUD panels */}
