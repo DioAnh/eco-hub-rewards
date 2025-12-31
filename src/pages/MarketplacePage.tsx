@@ -5,6 +5,14 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Filter, Search, Grid, List, Leaf, Recycle, Zap } from "lucide-react";
 import { MatrixBackground, CyberHeader, CyberButton } from "@/components/cyberpunk";
 
+// Import product images
+import bambooBottle from "@/assets/products/bamboo-water-bottle.jpg";
+import recycledBackpack from "@/assets/products/recycled-backpack.jpg";
+import organicTee from "@/assets/products/organic-cotton-tee.jpg";
+import solarPowerBank from "@/assets/products/solar-power-bank.jpg";
+import hempWallet from "@/assets/products/hemp-wallet.jpg";
+import upcycledSneakers from "@/assets/products/upcycled-sneakers.jpg";
+
 const MarketplacePage = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [activeFilter, setActiveFilter] = useState("all");
@@ -23,7 +31,7 @@ const MarketplacePage = () => {
       price: "25 ECO",
       ecoScore: 95,
       category: "eco",
-      image: "/placeholder.svg",
+      image: bambooBottle,
       badge: "ECO_CERTIFIED",
     },
     {
@@ -32,7 +40,7 @@ const MarketplacePage = () => {
       price: "120 ECO",
       ecoScore: 88,
       category: "recycled",
-      image: "/placeholder.svg",
+      image: recycledBackpack,
       badge: "RECYCLED",
     },
     {
@@ -41,7 +49,7 @@ const MarketplacePage = () => {
       price: "45 ECO",
       ecoScore: 92,
       category: "organic",
-      image: "/placeholder.svg",
+      image: organicTee,
       badge: "ORGANIC",
     },
     {
@@ -50,7 +58,7 @@ const MarketplacePage = () => {
       price: "85 ECO",
       ecoScore: 96,
       category: "eco",
-      image: "/placeholder.svg",
+      image: solarPowerBank,
       badge: "ECO_CERTIFIED",
     },
     {
@@ -59,7 +67,7 @@ const MarketplacePage = () => {
       price: "35 ECO",
       ecoScore: 90,
       category: "organic",
-      image: "/placeholder.svg",
+      image: hempWallet,
       badge: "ORGANIC",
     },
     {
@@ -68,7 +76,7 @@ const MarketplacePage = () => {
       price: "150 ECO",
       ecoScore: 85,
       category: "recycled",
-      image: "/placeholder.svg",
+      image: upcycledSneakers,
       badge: "RECYCLED",
     },
   ];
