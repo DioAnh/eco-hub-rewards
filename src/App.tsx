@@ -17,6 +17,7 @@ import BlogPage from "./pages/BlogPage";
 import DocsPage from "./pages/DocsPage";
 import TermsPage from "./pages/TermsPage";
 import ListingGuidePage from "./pages/ListingGuidePage";
+import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/staking" element={<StakingPage />} />
                 <Route path="/whitepaper" element={<WhitepaperPage />} />
                 <Route path="/marketplace" element={<MarketplacePage />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/blog" element={<BlogPage />} />
                 <Route path="/docs" element={<DocsPage />} />
                 <Route path="/terms" element={<TermsPage />} />
