@@ -1,8 +1,12 @@
 import { motion } from "framer-motion";
-import { Terminal } from "lucide-react";
+import { Terminal, Wallet } from "lucide-react";
+import { Link } from "react-router-dom";
 import { WalletConnectButton } from "@/components/WalletConnectButton";
+import { useWalletDemo } from "@/hooks/useWalletDemo";
 
 export const CyberHeader = () => {
+  const { isConnected, balance } = useWalletDemo();
+
   return (
     <motion.header
       className="fixed top-8 left-0 right-0 z-40 px-6"
@@ -12,7 +16,7 @@ export const CyberHeader = () => {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-3 group">
+        <Link to="/" className="flex items-center gap-3 group">
           <motion.div
             className="w-12 h-12 bg-black/80 border border-primary/50 flex items-center justify-center"
             style={{
@@ -31,10 +35,26 @@ export const CyberHeader = () => {
             </span>
             <div className="text-xs text-muted-foreground font-mono">v2.0.0</div>
           </div>
-        </a>
+        </Link>
 
-        {/* Right side - Wallet */}
-        <div className="flex items-center gap-4">
+        {/* Right side - Balance + Wallet */}
+        <div className="flex items-center gap-3">
+          {/* ECO Balance - Always visible when connected */}
+          {isConnected && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-black/80 border border-primary/40"
+              style={{
+                clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+              }}
+            >
+              <Wallet className="w-4 h-4 text-primary" />
+              <span className="text-lg font-bold text-primary font-mono neon-text">{balance}</span>
+              <span className="text-xs text-secondary font-mono">ECO</span>
+            </motion.div>
+          )}
+          
           <WalletConnectButton />
         </div>
       </div>
