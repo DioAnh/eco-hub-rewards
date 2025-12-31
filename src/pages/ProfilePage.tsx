@@ -31,7 +31,7 @@ const ProfilePage = () => {
   // Calculate stats from transactions
   const purchaseTransactions = transactions.filter((t) => t.type === "purchase");
   const totalSpent = purchaseTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
-  const totalCO2Saved = purchaseTransactions.length * 2.5; // Simulated: 2.5kg CO2 per purchase
+  const totalCO2Saved = purchaseTransactions.reduce((sum, t) => sum + (t.co2Saved || 0), 0);
 
   // Demo upcoming events
   const upcomingEvents = [
@@ -338,13 +338,15 @@ const ProfilePage = () => {
                             <Recycle className="w-8 h-8 text-primary" />
                           </div>
                           <div className="flex-1">
-                            <div className="font-mono text-foreground">{tx.description}</div>
+                            <div className="font-mono text-foreground">{tx.productName || tx.description}</div>
                             <div className="text-xs text-muted-foreground font-mono">
-                              {tx.timestamp.toLocaleString()}
+                              {tx.timestamp.toLocaleString()} • Eco-Score: {tx.ecoScore || 90}
                             </div>
                           </div>
-                          <div className="font-mono font-bold text-red-400">{tx.amount} ECO</div>
-                          <div className="text-xs text-primary font-mono">+2.5kg CO2</div>
+                          <div className="text-right">
+                            <div className="font-mono font-bold text-red-400">{tx.amount} ECO</div>
+                            <div className="text-xs text-primary font-mono">+{tx.co2Saved || 0}kg CO2</div>
+                          </div>
                         </div>
                       ))}
                     </div>

@@ -14,6 +14,9 @@ export interface Transaction {
   amount: number;
   description: string;
   timestamp: Date;
+  productName?: string;
+  co2Saved?: number;
+  ecoScore?: number;
 }
 
 export interface Investment {
@@ -39,22 +42,61 @@ export interface PendingReward {
 }
 
 const INITIAL_BALANCE = 100;
+const STORAGE_KEY = "ecoshop_wallet_state";
+
+// Helper to serialize/deserialize dates
+const serializeState = (state: WalletState): string => {
+  return JSON.stringify(state, (key, value) => {
+    if (value instanceof Date) {
+      return { __isDate: true, value: value.toISOString() };
+    }
+    return value;
+  });
+};
+
+const deserializeState = (json: string): WalletState => {
+  return JSON.parse(json, (key, value) => {
+    if (value && typeof value === 'object' && value.__isDate) {
+      return new Date(value.value);
+    }
+    return value;
+  });
+};
+
+const getInitialState = (): WalletState => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return deserializeState(saved);
+    }
+  } catch (e) {
+    console.error("Failed to load wallet state:", e);
+  }
+  return {
+    balance: 0,
+    transactions: [],
+    investments: [],
+    pendingReward: null,
+  };
+};
 
 export const useWalletDemo = () => {
   // Use real Sui wallet for connection status
   const { isConnected, shortAddress, walletAddress } = useSuiWallet();
   
-  const [walletState, setWalletState] = useState<WalletState>({
-    balance: 0,
-    transactions: [],
-    investments: [],
-    pendingReward: null,
-  });
+  const [walletState, setWalletState] = useState<WalletState>(getInitialState);
 
-  // When wallet connects, initialize with demo balance
+  // Persist state to localStorage whenever it changes
+  useEffect(() => {
+    if (walletState.balance > 0 || walletState.transactions.length > 0) {
+      localStorage.setItem(STORAGE_KEY, serializeState(walletState));
+    }
+  }, [walletState]);
+
+  // When wallet connects, initialize with demo balance if empty
   useEffect(() => {
     if (isConnected && walletState.balance === 0 && walletState.transactions.length === 0) {
-      setWalletState({
+      const initialState: WalletState = {
         balance: INITIAL_BALANCE,
         transactions: [
           {
@@ -67,15 +109,19 @@ export const useWalletDemo = () => {
         ],
         investments: [],
         pendingReward: null,
-      });
+      };
+      setWalletState(initialState);
+      localStorage.setItem(STORAGE_KEY, serializeState(initialState));
     } else if (!isConnected) {
-      // Reset when disconnected
-      setWalletState({
+      // Clear state when disconnected
+      const emptyState: WalletState = {
         balance: 0,
         transactions: [],
         investments: [],
         pendingReward: null,
-      });
+      };
+      setWalletState(emptyState);
+      localStorage.removeItem(STORAGE_KEY);
     }
   }, [isConnected]);
 
@@ -83,6 +129,8 @@ export const useWalletDemo = () => {
     if (!isConnected) return false;
     if (walletState.balance < amount) return false;
 
+    const productEcoScore = ecoScore || 90;
+    const co2Saved = (productEcoScore / 100) * (amount / 10); // CO2 based on eco score and price
     const rewardAmount = Math.floor(amount * 0.1); // 10% reward
 
     const newTransaction: Transaction = {
@@ -91,6 +139,9 @@ export const useWalletDemo = () => {
       amount: -amount,
       description: `Purchased: ${itemName}`,
       timestamp: new Date(),
+      productName: itemName,
+      co2Saved: parseFloat(co2Saved.toFixed(2)),
+      ecoScore: productEcoScore,
     };
 
     // Set pending reward for reinvest decision
@@ -104,7 +155,7 @@ export const useWalletDemo = () => {
         productId: Date.now(),
         merchantName: merchantName || "EcoShop Partner",
         merchantId: merchantId || 1,
-        ecoScore: ecoScore || 90,
+        ecoScore: productEcoScore,
       },
     }));
 
