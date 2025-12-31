@@ -129,7 +129,7 @@ export const ProductDetailModal = ({
                     className="text-3xl font-bold mb-4"
                     style={{ color: "hsl(120 80% 65%)" }}
                   >
-                    {product.price.toLocaleString()}đ
+                    ${(product.price / 25000).toFixed(2)}
                   </p>
 
                   {/* Stats grid */}
@@ -189,9 +189,9 @@ export const ProductDetailModal = ({
 
                   {/* Description */}
                   <p className="text-sm text-muted-foreground mb-6 flex-1">
-                    Sản phẩm xanh được chứng nhận, góp phần giảm thiểu tác động môi trường. 
-                    Mua sản phẩm này để nhận <span className="text-secondary font-bold">+{product.ecoTokens} ECO Token</span> và 
-                    tiết kiệm <span className="text-primary font-bold">{product.co2Saved}kg CO₂</span>.
+                    Certified green product that helps reduce environmental impact. 
+                    Purchase this product to earn <span className="text-secondary font-bold">+{product.ecoTokens} ECO Token</span> and 
+                    save <span className="text-primary font-bold">{product.co2Saved}kg CO₂</span>.
                   </p>
 
                   {/* Actions */}
@@ -205,11 +205,11 @@ export const ProductDetailModal = ({
                       className="flex-1"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
-                      MUA NGAY
+                      BUY NOW
                     </CyberButton>
                     <CyberButton variant="secondary" onClick={onClose}>
                       <Leaf className="w-4 h-4 mr-2" />
-                      XEM THÊM
+                      VIEW MORE
                     </CyberButton>
                   </div>
                 </div>

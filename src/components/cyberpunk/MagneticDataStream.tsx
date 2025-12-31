@@ -368,7 +368,7 @@ const DataPacket = ({
               textShadow: '0 0 8px hsl(120 70% 50% / 0.4)',
             }}
           >
-            {product.price.toLocaleString()}đ
+            ${(product.price / 25000).toFixed(2)}
           </p>
         </div>
       </div>

@@ -246,9 +246,9 @@ export const TerminalModal = ({
                           <div className="font-mono text-xs text-primary/60 mb-2">{"// PRICING_DATA"}</div>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <div className="font-mono text-xs text-muted-foreground">VNĐ PRICE</div>
+                              <div className="font-mono text-xs text-muted-foreground">USD PRICE</div>
                               <div className="font-mono text-2xl text-primary neon-text">
-                                {product.price.toLocaleString()}đ
+                                ${(product.price / 25000).toFixed(2)}
                               </div>
                             </div>
                             <div>
@@ -340,7 +340,7 @@ export const TerminalModal = ({
                             className="w-full justify-center"
                           >
                             <ShoppingCart className="w-4 h-4 mr-2" />
-                            BUY WITH VNĐ
+                            BUY WITH USD
                           </CyberButton>
                           
                           <CyberButton 
