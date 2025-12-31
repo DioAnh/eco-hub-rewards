@@ -12,4 +12,5 @@ export { MagneticDataStream } from "./MagneticDataStream";
 export { ConductiveGrid } from "./ConductiveGrid";
 export { TerminalModal } from "./TerminalModal";
 export { PageTransition } from "./PageTransition";
+export { SplashScreen } from "./SplashScreen";
 export { default as CyberFooter } from "./CyberFooter";

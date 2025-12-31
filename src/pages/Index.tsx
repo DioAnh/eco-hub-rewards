@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import {
   MatrixBackground,
@@ -6,10 +7,13 @@ import {
   CyberMenu,
   MarqueeTicker,
   MagneticDataStream,
+  SplashScreen,
 } from "@/components/cyberpunk";
 import Footer from "@/components/Footer";
 
 const Index = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
   return (
     <>
       <Helmet>
@@ -20,7 +24,15 @@ const Index = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-black overflow-x-hidden scanlines">
+      {/* Splash Screen */}
+      {showSplash && (
+        <SplashScreen 
+          onComplete={() => setShowSplash(false)} 
+          duration={5000} 
+        />
+      )}
+
+      <div className={`min-h-screen bg-black overflow-x-hidden scanlines ${showSplash ? "hidden" : ""}`}>
         {/* Matrix Rain Background */}
         <MatrixBackground />
         
