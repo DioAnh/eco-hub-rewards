@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, Search, Grid, List, Leaf, Recycle, Zap, 
-  Wallet, ShoppingCart, X, Ticket, Gift, Calendar, Check
+  Wallet, ShoppingCart, X, Ticket, Gift, Calendar, Check, User
 } from "lucide-react";
-import { MatrixBackground, CyberHeader, CyberButton } from "@/components/cyberpunk";
+import { MatrixBackground, CyberHeader, CyberButton, PurchaseSuccessAnimation } from "@/components/cyberpunk";
 import { useWalletDemo } from "@/hooks/useWalletDemo";
 import { toast } from "sonner";
 
@@ -46,9 +46,12 @@ interface Product {
 }
 
 const MarketplacePage = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [purchasedProduct, setPurchasedProduct] = useState<{ name: string; price: number } | null>(null);
   const { isConnected, address, balance, purchase } = useWalletDemo();
 
   const categories = [
@@ -122,14 +125,16 @@ const MarketplacePage = () => {
 
     const success = purchase(product.price, product.name);
     if (success) {
-      toast.success(
-        <div className="flex flex-col">
-          <span className="font-bold">Purchase Successful!</span>
-          <span className="text-sm">You bought {product.name} for {product.price} ECO</span>
-        </div>
-      );
       setSelectedProduct(null);
+      setPurchasedProduct({ name: product.name, price: product.price });
+      setShowSuccessAnimation(true);
     }
+  };
+
+  const handleAnimationComplete = () => {
+    setShowSuccessAnimation(false);
+    setPurchasedProduct(null);
+    navigate("/profile");
   };
 
   return (
@@ -181,10 +186,10 @@ const MarketplacePage = () => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 flex gap-3"
                 >
                   <div
-                    className="p-4 min-w-[280px]"
+                    className="p-4 min-w-[240px]"
                     style={{
                       background: "linear-gradient(180deg, hsl(120 20% 8%) 0%, hsl(0 0% 4%) 100%)",
                       border: "1px solid hsl(120 100% 50% / 0.4)",
@@ -205,6 +210,15 @@ const MarketplacePage = () => {
                       {address}
                     </div>
                   </div>
+                  <Link
+                    to="/profile"
+                    className="p-4 flex items-center justify-center border border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all"
+                    style={{
+                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                    }}
+                  >
+                    <User className="w-6 h-6 text-primary" />
+                  </Link>
                 </motion.div>
               )}
             </motion.div>
@@ -457,6 +471,14 @@ const MarketplacePage = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Purchase Success Animation */}
+        <PurchaseSuccessAnimation
+          isVisible={showSuccessAnimation}
+          productName={purchasedProduct?.name || ""}
+          ecoTokens={purchasedProduct?.price || 0}
+          onComplete={handleAnimationComplete}
+        />
       </div>
     </>
   );
