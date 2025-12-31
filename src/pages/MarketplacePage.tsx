@@ -49,7 +49,7 @@ const MarketplacePage = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { wallet, connect, disconnect, purchase } = useWalletDemo();
+  const { isConnected, address, balance, purchase } = useWalletDemo();
 
   const categories = [
     { id: "all", label: "ALL_ITEMS", count: 22, icon: <Grid className="w-3 h-3" /> },
@@ -110,13 +110,13 @@ const MarketplacePage = () => {
   };
 
   const handleBuyProduct = (product: Product) => {
-    if (!wallet.isConnected) {
-      toast.error("Please connect your wallet first!");
+    if (!isConnected) {
+      toast.error("Please connect your wallet first using the button in the header!");
       return;
     }
 
-    if (wallet.balance < product.price) {
-      toast.error(`Insufficient balance! You need ${product.price} ECO but have ${wallet.balance} ECO.`);
+    if (balance < product.price) {
+      toast.error(`Insufficient balance! You need ${product.price} ECO but have ${balance} ECO.`);
       return;
     }
 
@@ -175,14 +175,14 @@ const MarketplacePage = () => {
                 </p>
               </div>
 
-              {/* Wallet Panel */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="flex-shrink-0"
-              >
-                {wallet.isConnected ? (
+              {/* Wallet Balance Panel - Only show when connected */}
+              {isConnected && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="flex-shrink-0"
+                >
                   <div
                     className="p-4 min-w-[280px]"
                     style={{
@@ -191,35 +191,22 @@ const MarketplacePage = () => {
                       clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
                     }}
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <Wallet className="w-4 h-4 text-primary" />
-                        <span className="font-mono text-xs text-primary">WALLET_CONNECTED</span>
-                      </div>
-                      <button
-                        onClick={disconnect}
-                        className="text-xs font-mono text-muted-foreground hover:text-red-400 transition-colors"
-                      >
-                        DISCONNECT
-                      </button>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Wallet className="w-4 h-4 text-primary" />
+                      <span className="font-mono text-xs text-primary">ECO_BALANCE</span>
                     </div>
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className="text-3xl font-bold text-primary font-mono neon-text">
-                        {wallet.balance}
+                        {balance}
                       </span>
                       <span className="text-sm text-secondary font-mono">ECO</span>
                     </div>
                     <div className="text-xs font-mono text-muted-foreground">
-                      {wallet.address}
+                      {address}
                     </div>
                   </div>
-                ) : (
-                  <CyberButton onClick={connect} variant="primary">
-                    <Wallet className="w-4 h-4 mr-2" />
-                    CONNECT_WALLET
-                  </CyberButton>
-                )}
-              </motion.div>
+                </motion.div>
+              )}
             </motion.div>
 
             {/* Search and filters */}
@@ -421,25 +408,25 @@ const MarketplacePage = () => {
                         ECO_SCORE: {selectedProduct.ecoScore}
                       </div>
                     </div>
-                    {wallet.isConnected && (
+                    {isConnected && (
                       <div className="text-right">
                         <div className="text-xs text-muted-foreground font-mono">YOUR_BALANCE</div>
-                        <div className={`text-lg font-bold font-mono ${wallet.balance >= selectedProduct.price ? "text-primary" : "text-red-400"}`}>
-                          {wallet.balance} ECO
+                        <div className={`text-lg font-bold font-mono ${balance >= selectedProduct.price ? "text-primary" : "text-red-400"}`}>
+                          {balance} ECO
                         </div>
                       </div>
                     )}
                   </div>
 
                   {/* Actions */}
-                  {wallet.isConnected ? (
+                  {isConnected ? (
                     <CyberButton
                       variant="primary"
                       className="w-full justify-center"
                       onClick={() => handleBuyProduct(selectedProduct)}
-                      disabled={wallet.balance < selectedProduct.price}
+                      disabled={balance < selectedProduct.price}
                     >
-                      {wallet.balance >= selectedProduct.price ? (
+                      {balance >= selectedProduct.price ? (
                         <>
                           <ShoppingCart className="w-4 h-4 mr-2" />
                           BUY FOR {selectedProduct.price} ECO
@@ -452,14 +439,12 @@ const MarketplacePage = () => {
                       )}
                     </CyberButton>
                   ) : (
-                    <CyberButton
-                      variant="primary"
-                      className="w-full justify-center"
-                      onClick={connect}
-                    >
-                      <Wallet className="w-4 h-4 mr-2" />
-                      CONNECT WALLET TO BUY
-                    </CyberButton>
+                    <div className="text-center p-4 border border-primary/30 bg-primary/5">
+                      <p className="text-sm text-muted-foreground font-mono mb-2">
+                        Connect your wallet using the button in the header
+                      </p>
+                      <Wallet className="w-6 h-6 text-primary mx-auto" />
+                    </div>
                   )}
                 </div>
 
