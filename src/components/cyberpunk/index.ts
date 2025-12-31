@@ -14,4 +14,5 @@ export { TerminalModal } from "./TerminalModal";
 export { PageTransition } from "./PageTransition";
 export { SplashScreen } from "./SplashScreen";
 export { default as PurchaseSuccessAnimation } from "./PurchaseSuccessAnimation";
+export { default as ReinvestTerminal } from "./ReinvestTerminal";
 export { default as CyberFooter } from "./CyberFooter";
