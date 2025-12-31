@@ -16,7 +16,7 @@ const Index = () => {
         <title>EcoShop - Circular Economy Hub on Sui Network</title>
         <meta
           name="description"
-          content="EcoShop - Nền tảng Circular Economy Hub đầu tiên trên Sui, token hóa tài sản xanh và thưởng ECO Token."
+          content="EcoShop - The first Circular Economy Hub on Sui, tokenizing green assets and rewarding ECO Tokens."
         />
       </Helmet>
 

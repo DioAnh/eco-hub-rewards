@@ -7,8 +7,8 @@ interface MarqueeTickerProps {
 }
 
 const defaultMessages = [
-  "USER_X9Y vừa giảm 2kg CO₂ trên chuỗi SUI",
-  "HỆ THỐNG ĐANG GHI NHẬN GIAO DỊCH #0x3f8a...",
+  "USER_X9Y just reduced 2kg CO₂ on SUI chain",
+  "SYSTEM RECORDING TRANSACTION #0x3f8a...",
   "ECO_TOKEN MINTED: +45 ECO → 0x7b2c...",
   "PROOF_OF_GREEN VERIFIED ✓",
   "NEW_MERCHANT REGISTERED: GreenLife Store",

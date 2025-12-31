@@ -20,15 +20,15 @@ const CyberFooter = () => {
       { label: "Smart Contracts", href: "#" },
     ],
     company: [
-      { label: "Về chúng tôi", href: "#" },
+      { label: "About Us", href: "#" },
       { label: "Blog", href: "#" },
       { label: "Careers", href: "#" },
-      { label: "Liên hệ", href: "#" },
+      { label: "Contact", href: "#" },
     ],
     legal: [
-      { label: "Điều khoản", href: "#" },
-      { label: "Bảo mật", href: "#" },
-      { label: "Cookie", href: "#" },
+      { label: "Terms", href: "#" },
+      { label: "Privacy", href: "#" },
+      { label: "Cookies", href: "#" },
     ],
   };
 
@@ -156,7 +156,7 @@ const CyberFooter = () => {
               <span className="font-mono text-lg text-primary neon-text">EcoShop</span>
             </Link>
             <p className="font-mono text-xs text-muted-foreground mb-4 leading-relaxed">
-              {"// "} Circular Economy Hub trên Sui Network. Tài chính hóa hành vi giảm phát thải CO₂.
+              {"// "} Circular Economy Hub on Sui Network. Monetizing carbon reduction behavior.
             </p>
             
             {/* Social links */}
