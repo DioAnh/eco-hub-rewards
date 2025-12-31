@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import {
   MatrixBackground,
@@ -11,8 +11,18 @@ import {
 } from "@/components/cyberpunk";
 import Footer from "@/components/Footer";
 
+// Use sessionStorage to only show splash once per session
+const SPLASH_KEY = "ecoshop_splash_shown";
+
 const Index = () => {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    return !sessionStorage.getItem(SPLASH_KEY);
+  });
+
+  const handleSplashComplete = () => {
+    sessionStorage.setItem(SPLASH_KEY, "true");
+    setShowSplash(false);
+  };
 
   return (
     <>
@@ -24,10 +34,10 @@ const Index = () => {
         />
       </Helmet>
 
-      {/* Splash Screen */}
+      {/* Splash Screen - only shows once per session */}
       {showSplash && (
         <SplashScreen 
-          onComplete={() => setShowSplash(false)} 
+          onComplete={handleSplashComplete} 
           duration={8000} 
         />
       )}
