@@ -41,7 +41,7 @@ export interface PendingReward {
   ecoScore: number;
 }
 
-const INITIAL_BALANCE = 100;
+const INITIAL_BALANCE = 1000;
 const STORAGE_KEY = "ecoshop_wallet_state";
 
 // Helper to serialize/deserialize dates
