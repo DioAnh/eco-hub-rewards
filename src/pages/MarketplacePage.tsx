@@ -123,7 +123,7 @@ const MarketplacePage = () => {
       return;
     }
 
-    const success = purchase(product.price, product.name);
+    const success = purchase(product.price, product.name, product.id, "EcoShop Partner", product.ecoScore);
     if (success) {
       setSelectedProduct(null);
       setPurchasedProduct({ name: product.name, price: product.price });
