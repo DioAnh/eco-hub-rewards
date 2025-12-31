@@ -28,7 +28,7 @@ const Index = () => {
       {showSplash && (
         <SplashScreen 
           onComplete={() => setShowSplash(false)} 
-          duration={5000} 
+          duration={8000} 
         />
       )}
 
